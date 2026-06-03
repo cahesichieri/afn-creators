@@ -65,6 +65,7 @@ export default function PortalCreator() {
           <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:3}}>A Farmácia Natural</div>
           <div style={{fontSize:'.9rem',fontWeight:700,color:'#fff'}}>Olá, {creator.nome.split(' ')[0]} 👋</div>
         </div>
+        <a href="/creator/bancario" style={{fontSize:'.7rem',color:'rgba(255,255,255,.6)',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.15)',borderRadius:3,padding:'5px 12px',textDecoration:'none',marginRight:8}}>Dados bancarios</a>
         <button onClick={sair} style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',background:'none',border:'1px solid rgba(255,255,255,.1)',borderRadius:3,padding:'5px 12px'}}>Sair</button>
       </div>
 

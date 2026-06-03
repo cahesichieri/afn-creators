@@ -107,6 +107,7 @@ export default function Creators() {
                     </span>
                   </td>
                   <td style={{padding:'11px 14px',display:'flex',gap:8}}>
+                    <a href={"/dashboard/creators/"+c.id} style={{fontSize:'.7rem',color:'var(--teal-d)',background:'none',border:'none',fontWeight:600,textDecoration:'underline',textUnderlineOffset:2,cursor:'pointer'}}>Ver perfil</a>
                     <button onClick={()=>abrir(c)} style={{fontSize:'.7rem',color:'var(--navy)',background:'none',border:'none',fontWeight:600,textDecoration:'underline',textUnderlineOffset:2}}>Editar</button>
                     <button onClick={()=>excluir(c.id)} style={{fontSize:'.7rem',color:'var(--red)',background:'none',border:'none',fontWeight:600,textDecoration:'underline',textUnderlineOffset:2}}>Excluir</button>
                   </td>
