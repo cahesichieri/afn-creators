@@ -11,6 +11,7 @@ export default function PortalCreator() {
   const [roteiros, setRoteiros] = useState([])
   const [comissoes, setComissoes] = useState([])
   const [aba, setAba] = useState('metricas')
+  const [semOnboarding, setSemOnboarding] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function PortalCreator() {
         supabase.from('campanhas').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}).then(({data:cs})=>setCampanhas(cs||[]))
         supabase.from('roteiros').select('*').eq('creator_id',c.id).order('data_post',{ascending:true}).then(({data:rs})=>setRoteiros(rs||[]))
         supabase.from('comissoes').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}).then(({data:cms})=>setComissoes(cms||[]))
+        supabase.from('onboarding').select('id').eq('creator_id',c.id).single().then(({data:ob})=>{ if(!ob) setSemOnboarding(true) })
       })
     })
   }, [])
@@ -32,6 +34,23 @@ export default function PortalCreator() {
   async function sair() { await supabase.auth.signOut(); router.push('/login') }
 
   if (!creator) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--ink3)'}}>Carregando...</div>
+
+  if (semOnboarding) return (
+    <div style={{minHeight:'100vh',background:'var(--bg)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div style={{maxWidth:480,background:'var(--card)',border:'1px solid var(--rule)',borderRadius:8,overflow:'hidden'}}>
+        <div style={{background:'var(--navy)',padding:'28px 32px'}}>
+          <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:8}}>A Farmácia Natural</div>
+          <div style={{fontFamily:'var(--serif)',fontSize:'1.8rem',fontWeight:700,color:'#fff',lineHeight:1.1}}>Bem-vinda,<br/>{creator.nome.split(' ')[0]}! 🌿</div>
+        </div>
+        <div style={{padding:'28px 32px'}}>
+          <p style={{fontSize:'.85rem',color:'var(--ink2)',lineHeight:1.7,marginBottom:24}}>Antes de começar, precisamos conhecer melhor você e o seu público. Isso leva menos de 5 minutos e nos ajuda a encontrar os produtos certos para a sua audiência.</p>
+          <a href="/creator/onboarding" style={{display:'block',background:'var(--navy)',color:'#fff',border:'none',borderRadius:4,padding:'12px',fontSize:'.85rem',fontWeight:700,textAlign:'center',textDecoration:'none'}}>
+            Preencher meu perfil →
+          </a>
+        </div>
+      </div>
+    </div>
+  )
 
   const totalComissoes = comissoes.filter(c=>c.status!=='pago').reduce((a,c)=>a+(c.valor_liquido||0),0)
   const totalPago = comissoes.filter(c=>c.status==='pago').reduce((a,c)=>a+(c.valor_liquido||0),0)
