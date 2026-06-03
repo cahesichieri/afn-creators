@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) { router.push('/login'); return }
+      if (!data?.user) { router.push('/login'); return }
       supabase.from('perfis').select('*').eq('id', data.user.id).single()
         .then(({ data: p }) => { if (p) setPerfil(p); else router.push('/login') })
     })
