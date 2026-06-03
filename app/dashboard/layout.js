@@ -10,6 +10,7 @@ const nav = [
   { href:'/dashboard/campanhas',   icon:'📥', label:'Campanhas'   },
   { href:'/dashboard/roteiros',    icon:'📝', label:'Roteiros'    },
   { href:'/dashboard/comissoes',   icon:'💰', label:'Comissões'   },
+  { href:'/dashboard/onboarding', icon:'📋', label:'Onboarding'  },
   { href:'/dashboard/analise',     icon:'🤖', label:'Análise IA'  },
 ]
 
