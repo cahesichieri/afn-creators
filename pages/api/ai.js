@@ -1,0 +1,19 @@
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" })
+  try {
+    const { messages, system, max_tokens = 2000 } = req.body
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) return res.status(500).json({ error: "API key nao configurada" })
+    const AFN = "Voce e a IA da A Farmacia Natural (AFN), marca brasileira de nutraceuticos premium para mulheres 25+. CATALOGO: AFN32+ (R$187,90) Metabolismo/emagrecimento capsulas; AFN77+ (R$390) Longevidade/colageno po 300g; AFN9+ (R$600) Performance/energia capsulas; AFN Nac - Detox/antioxidante; AFN Biotin B7 - Cabelo/pele/unhas. PERSONA: Mulheres 25-55 classe B/C SP. ARQUETIPOS: Sage (Ciencia Simplificada) + Caregiver. TOM: Especialista, moderno, acolhedor, sem promessas miraculosas. ESTRATEGIA: Marketing de Premissas, Reels engaja, Stories converte."
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens, system: system ? AFN + " " + system : AFN, messages })
+    })
+    const data = await resp.json()
+    if (!resp.ok) return res.status(resp.status).json({ error: data.error?.message || "Erro" })
+    return res.status(200).json(data)
+  } catch (err) {
+    return res.status(500).json({ error: err.message })
+  }
+}
