@@ -29,9 +29,9 @@ export default function Roteiros() {
     setGerando(true)
     const creator = creators.find(c=>c.id===form.creator_id)
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages',{
+      const res = await fetch('/api/ai',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos. Crie um roteiro condensado para a creator ${creator?.nome||''}.
+        body:JSON.stringify({messages:[{role:'user',content:`Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos. Crie um roteiro condensado para a creator ${creator?.nome||''}.
 
 Tema: "${form.tema}"
 Tipo: ${form.tipo} | Formato: ${form.formato}

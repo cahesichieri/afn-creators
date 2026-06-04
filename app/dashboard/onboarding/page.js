@@ -35,7 +35,7 @@ export default function OnboardingDashboard() {
     const resumo = Object.entries(respostas).map(([k,v]) => `${k}: ${v}`).join('\n')
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

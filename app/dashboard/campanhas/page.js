@@ -58,9 +58,9 @@ export default function Campanhas() {
 ## Recomendações` },
         ...imagens.map(img=>({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}))
       ]
-      const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      const resp = await fetch('/api/ai',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content}]})
+        body:JSON.stringify({messages:[{role:'user',content}]})
       })
       const data = await resp.json()
       const texto = data.content?.find(b=>b.type==='text')?.text||''

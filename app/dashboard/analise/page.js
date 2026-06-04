@@ -30,9 +30,9 @@ Funcionou: ${c.positivo||'—'} | Não funcionou: ${c.negativo||'—'}
 ${c.analise_ia?`IA prévia: ${c.analise_ia.substring(0,200)}`:''}`
     }).join('\n---\n')
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages',{
+      const res = await fetch('/api/ai',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Especialista em marketing de influência para nutracêuticos femininos. Marca: A Farmácia Natural (AFN). Técnica das Premissas: Reels engajam, Stories convertem. Comissão 15%.\n\nANÁLISE: ${tipoLabel}\n\nDADOS:\n${resumo}\n\nResponda em português, direto e acionável:\n## Diagnóstico Geral\n## Pontos Fortes\n## Falhas\n## O que Repetir\n## O que Mudar\n## Recomendações Prioritárias (numeradas)`}]})
+        body:JSON.stringify({messages:[{role:'user',content:`Especialista em marketing de influência para nutracêuticos femininos. Marca: A Farmácia Natural (AFN). Técnica das Premissas: Reels engajam, Stories convertem. Comissão 15%.\n\nANÁLISE: ${tipoLabel}\n\nDADOS:\n${resumo}\n\nResponda em português, direto e acionável:\n## Diagnóstico Geral\n## Pontos Fortes\n## Falhas\n## O que Repetir\n## O que Mudar\n## Recomendações Prioritárias (numeradas)`}]})
       })
       const d = await res.json()
       setResposta(d.content?.find(b=>b.type==='text')?.text||'Erro ao obter resposta.')
