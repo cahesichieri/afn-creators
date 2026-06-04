@@ -5,27 +5,34 @@ const AFN = "Voce e a IA da A Farmacia Natural (AFN), marca brasileira de nutrac
 export async function POST(request) {
   try {
     const { messages, system, max_tokens = 2000 } = await request.json()
-    const apiKey = process.env.ANTHROPIC_API_KEY
+    const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) return NextResponse.json({ error: 'API key nao configurada' }, { status: 500 })
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens,
-        system: system ? AFN + ' ' + system : AFN,
-        messages
-      })
-    })
+    // Monta o prompt com system prompt + mensagens do usuário
+    const systemPrompt = system ? AFN + ' ' + system : AFN
+    const userMessage = messages.map(m => m.content).join('\n')
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+          generationConfig: { maxOutputTokens: max_tokens, temperature: 0.7 }
+        })
+      }
+    )
 
     const data = await resp.json()
-    if (!resp.ok) return NextResponse.json({ error: data.error?.message || 'Erro' }, { status: resp.status })
-    return NextResponse.json(data)
+    if (!resp.ok) return NextResponse.json({ error: data.error?.message || 'Erro Gemini' }, { status: resp.status })
+
+    // Normaliza resposta para o mesmo formato da Anthropic (content[].text)
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    if (!text) return NextResponse.json({ error: 'Resposta vazia da IA' }, { status: 500 })
+
+    return NextResponse.json({ content: [{ type: 'text', text }] })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
