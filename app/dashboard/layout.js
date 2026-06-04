@@ -12,6 +12,7 @@ const nav = [
   { href:'/dashboard/comissoes',   icon:'💰', label:'Comissões'   },
   { href:'/dashboard/onboarding', icon:'📋', label:'Onboarding'  },
   { href:'/dashboard/analise',     icon:'🤖', label:'Análise IA'  },
+  { href:'/dashboard/amostras',    icon:'📦', label:'Amostras'    },
 ]
 
 export default function DashboardLayout({ children }) {
