@@ -20,6 +20,8 @@ export default function PortalCreator() {
   const [modalAmostra, setModalAmostra] = useState(false)
   const [pedido, setPedido] = useState([])
   const [enviandoPedido, setEnviandoPedido] = useState(false)
+  const [expandido, setExpandido] = useState(null)
+  function toggle(id) { setExpandido(e => e === id ? null : id) }
   const router = useRouter()
 
   useEffect(() => {
@@ -174,30 +176,40 @@ export default function PortalCreator() {
                 const statusColor = { ativa:'var(--green)', futura:'var(--teal-d)', encerrada:'var(--ink3)', planejada:'var(--amber)' }
                 const statusBg = { ativa:'var(--green-lt)', futura:'var(--teal-lt)', encerrada:'var(--navy-xs)', planejada:'var(--amber-lt)' }
                 const conv = c.leads>0?(c.pedidos_pagos/c.leads*100).toFixed(1):0
+                const aberto = expandido === c.id
                 return (
                   <div key={c.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
-                    <div style={{padding:'12px 14px',background:'var(--bg)',borderBottom:'1px solid var(--rule)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
+                    <div onClick={()=>toggle(c.id)} style={{padding:'12px 14px',background:'var(--bg)',borderBottom: aberto?'1px solid var(--rule)':'none',display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,cursor:'pointer'}}>
                       <div style={{fontWeight:700,color:'var(--navy)',fontSize:'.88rem',flex:1}}>{c.nome||c.periodo||'Campanha'}</div>
                       <span style={{fontSize:'.6rem',fontWeight:700,padding:'3px 8px',borderRadius:3,background:statusBg[status],color:statusColor[status]}}>{status}</span>
+                      <span style={{color:'var(--ink3)',fontSize:'.75rem'}}>{aberto?'▲':'▼'}</span>
                     </div>
-                    <div style={{padding:'12px 14px'}}>
-                      {c.periodo && <div style={{fontSize:'.72rem',color:'var(--ink3)',marginBottom:8}}>📅 {c.periodo}</div>}
-                      {c.produtos_nomes && <div style={{fontSize:'.72rem',color:'var(--teal-d)',marginBottom:8}}>🧪 {c.produtos_nomes}</div>}
-                      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Leads</div>
-                          <div style={{fontSize:'1rem',fontWeight:700,color:'var(--ink)'}}>{c.leads||0}</div>
+                    {aberto && (
+                      <div style={{padding:'12px 14px'}}>
+                        {c.periodo && <div style={{fontSize:'.72rem',color:'var(--ink3)',marginBottom:8}}>📅 {c.periodo}</div>}
+                        {c.produtos_nomes && <div style={{fontSize:'.72rem',color:'var(--teal-d)',marginBottom:8}}>🧪 {c.produtos_nomes}</div>}
+                        {c.observacoes && <div style={{fontSize:'.76rem',color:'var(--ink2)',marginBottom:12,lineHeight:1.5,padding:'8px 10px',background:'var(--bg)',borderRadius:4,border:'1px solid var(--rule)'}}>{c.observacoes}</div>}
+                        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom: conv>0?12:0}}>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Leads</div>
+                            <div style={{fontSize:'1rem',fontWeight:700,color:'var(--ink)'}}>{c.leads||0}</div>
+                          </div>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Vendas</div>
+                            <div style={{fontSize:'1rem',fontWeight:700,color:'var(--ink)'}}>{c.pedidos_pagos||0}</div>
+                          </div>
+                          <div style={{textAlign:'center'}}>
+                            <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Receita</div>
+                            <div style={{fontSize:'1rem',fontWeight:700,color:'var(--green)'}}>R${fmt(c.receita)}</div>
+                          </div>
                         </div>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Vendas</div>
-                          <div style={{fontSize:'1rem',fontWeight:700,color:'var(--ink)'}}>{c.pedidos_pagos||0}</div>
-                        </div>
-                        <div style={{textAlign:'center'}}>
-                          <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Receita</div>
-                          <div style={{fontSize:'1rem',fontWeight:700,color:'var(--green)'}}>R${fmt(c.receita)}</div>
-                        </div>
+                        {conv>0 && (
+                          <div style={{textAlign:'center',padding:'6px',background:'var(--green-lt)',borderRadius:4}}>
+                            <span style={{fontSize:'.7rem',fontWeight:700,color:'var(--green)'}}>Conversão: {conv}%</span>
+                          </div>
+                        )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 )
               })
@@ -210,23 +222,30 @@ export default function PortalCreator() {
           <div style={{display:'grid',gap:10}}>
             {roteiros.length===0
               ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem',background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6}}>Nenhum roteiro disponível.</div>
-              : roteiros.map(r=>(
-                <div key={r.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'var(--bg)',borderBottom:'1px solid var(--rule)',flexWrap:'wrap'}}>
-                    <span style={{fontSize:'.6rem',fontWeight:700,padding:'2px 7px',borderRadius:3,background:tipoBg[r.tipo],color:tipoColors[r.tipo]}}>{r.tipo}</span>
-                    <span style={{fontSize:'.78rem',fontWeight:600,color:'var(--ink)',flex:1}}>{r.tema}</span>
-                    {r.data_post && <span style={{fontSize:'.7rem',color:'var(--ink3)'}}>{new Date(r.data_post+'T00:00:00').toLocaleDateString('pt-BR')}</span>}
-                  </div>
-                  <div style={{padding:'12px 14px',display:'grid',gap:5}}>
-                    {[['Gancho 01',r.gancho_01,'#f0eeff','var(--navy)'],['Premissa 01',r.premissa_01,'#edfbff','#1a6e8a'],['Premissa 02',r.premissa_02,'#edfbff','#1a6e8a'],['Gancho 02',r.gancho_02,'#f0eeff','var(--navy)'],['CTA',r.cta,'var(--green-lt)','var(--green)']].filter(([,v])=>v).map(([label,val,bg,color])=>(
-                      <div key={label} style={{display:'grid',gridTemplateColumns:'80px 1fr',border:'1px solid var(--rule)',borderRadius:3,overflow:'hidden'}}>
-                        <div style={{padding:'7px 8px',background:bg,borderRight:'1px solid var(--rule)',fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',fontWeight:700,color,display:'flex',alignItems:'center'}}>{label}</div>
-                        <div style={{padding:'7px 10px',fontSize:'.78rem',color:'var(--ink)',lineHeight:1.5}}>{val}</div>
+              : roteiros.map(r=>{
+                const aberto = expandido === r.id
+                return (
+                  <div key={r.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
+                    <div onClick={()=>toggle(r.id)} style={{display:'flex',alignItems:'center',gap:8,padding:'12px 14px',background:'var(--bg)',borderBottom:aberto?'1px solid var(--rule)':'none',flexWrap:'wrap',cursor:'pointer'}}>
+                      <span style={{fontSize:'.6rem',fontWeight:700,padding:'2px 7px',borderRadius:3,background:tipoBg[r.tipo],color:tipoColors[r.tipo]}}>{r.tipo}</span>
+                      <span style={{fontSize:'.78rem',fontWeight:600,color:'var(--ink)',flex:1}}>{r.tema}</span>
+                      {r.data_post && <span style={{fontSize:'.7rem',color:'var(--ink3)'}}>{new Date(r.data_post+'T00:00:00').toLocaleDateString('pt-BR')}</span>}
+                      <span style={{color:'var(--ink3)',fontSize:'.75rem'}}>{aberto?'▲':'▼'}</span>
+                    </div>
+                    {aberto && (
+                      <div style={{padding:'12px 14px',display:'grid',gap:5}}>
+                        {r.desenvolvimento && <p style={{fontSize:'.76rem',color:'var(--ink2)',marginBottom:6,lineHeight:1.55,fontStyle:'italic'}}>{r.desenvolvimento}</p>}
+                        {[['Gancho 01',r.gancho_01,'#f0eeff','var(--navy)'],['Premissa 01',r.premissa_01,'#edfbff','#1a6e8a'],['Premissa 02',r.premissa_02,'#edfbff','#1a6e8a'],['Premissa 03',r.premissa_03,'#edfbff','#1a6e8a'],['Gancho 02',r.gancho_02,'#f0eeff','var(--navy)'],['CTA',r.cta,'var(--green-lt)','var(--green)']].filter(([,v])=>v).map(([label,val,bg,color])=>(
+                          <div key={label} style={{display:'grid',gridTemplateColumns:'80px 1fr',border:'1px solid var(--rule)',borderRadius:3,overflow:'hidden'}}>
+                            <div style={{padding:'7px 8px',background:bg,borderRight:'1px solid var(--rule)',fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',fontWeight:700,color,display:'flex',alignItems:'center'}}>{label}</div>
+                            <div style={{padding:'7px 10px',fontSize:'.78rem',color:'var(--ink)',lineHeight:1.5}}>{val}</div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-              ))
+                )
+              })
             }
           </div>
         )}
@@ -236,18 +255,43 @@ export default function PortalCreator() {
           <div style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
             {comissoes.length===0
               ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem'}}>Nenhuma comissão ainda.</div>
-              : comissoes.map(c=>(
-                <div key={c.id} style={{padding:'14px 16px',borderBottom:'1px solid var(--rule)',display:'grid',gridTemplateColumns:'1fr auto',gap:8,alignItems:'center'}}>
-                  <div>
-                    <div style={{fontWeight:600,fontSize:'.84rem',color:'var(--ink)',marginBottom:2}}>{c.mes_referencia}</div>
-                    <div style={{fontSize:'.7rem',color:'var(--ink3)'}}>{c.data_pagamento ? 'Pago em '+c.data_pagamento : 'Pendente'}</div>
+              : comissoes.map(c=>{
+                const aberto = expandido === c.id
+                return (
+                  <div key={c.id} style={{borderBottom:'1px solid var(--rule)'}}>
+                    <div onClick={()=>toggle(c.id)} style={{padding:'14px 16px',display:'grid',gridTemplateColumns:'1fr auto',gap:8,alignItems:'center',cursor:'pointer'}}>
+                      <div>
+                        <div style={{fontWeight:600,fontSize:'.84rem',color:'var(--ink)',marginBottom:2}}>{c.mes_referencia}</div>
+                        <div style={{fontSize:'.7rem',color:'var(--ink3)'}}>{c.data_pagamento ? 'Pago em '+c.data_pagamento : 'Pendente'}</div>
+                      </div>
+                      <div style={{textAlign:'right',display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}}>
+                        <div style={{fontSize:'.9rem',fontWeight:700,color:'var(--green)'}}>R$ {fmt(c.valor_liquido)}</div>
+                        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                          <span style={{fontSize:'.6rem',fontWeight:700,padding:'2px 7px',borderRadius:3,background:c.status==='pago'?'var(--green-lt)':'var(--amber-lt)',color:c.status==='pago'?'var(--green)':'var(--amber)'}}>{c.status}</span>
+                          <span style={{color:'var(--ink3)',fontSize:'.75rem'}}>{aberto?'▲':'▼'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {aberto && (
+                      <div style={{padding:'0 16px 14px',display:'grid',gap:6}}>
+                        {c.valor_bruto && (
+                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                            <div style={{background:'var(--bg)',border:'1px solid var(--rule)',borderRadius:4,padding:'10px 12px'}}>
+                              <div style={{fontSize:'.55rem',textTransform:'uppercase',color:'var(--ink3)',fontWeight:700,marginBottom:3}}>Valor bruto</div>
+                              <div style={{fontWeight:700,color:'var(--ink)'}}>R$ {fmt(c.valor_bruto)}</div>
+                            </div>
+                            <div style={{background:'var(--bg)',border:'1px solid var(--rule)',borderRadius:4,padding:'10px 12px'}}>
+                              <div style={{fontSize:'.55rem',textTransform:'uppercase',color:'var(--ink3)',fontWeight:700,marginBottom:3}}>Comissão</div>
+                              <div style={{fontWeight:700,color:'var(--teal-d)'}}>{c.comissao_pct||15}%</div>
+                            </div>
+                          </div>
+                        )}
+                        {c.observacoes && <div style={{fontSize:'.76rem',color:'var(--ink2)',padding:'8px 10px',background:'var(--bg)',borderRadius:4,border:'1px solid var(--rule)',lineHeight:1.5}}>{c.observacoes}</div>}
+                      </div>
+                    )}
                   </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:'.9rem',fontWeight:700,color:'var(--green)',marginBottom:4}}>R$ {fmt(c.valor_liquido)}</div>
-                    <span style={{fontSize:'.6rem',fontWeight:700,padding:'2px 7px',borderRadius:3,background:c.status==='pago'?'var(--green-lt)':'var(--amber-lt)',color:c.status==='pago'?'var(--green)':'var(--amber)'}}>{c.status}</span>
-                  </div>
-                </div>
-              ))
+                )
+              })
             }
           </div>
         )}
