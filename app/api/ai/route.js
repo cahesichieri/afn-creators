@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
+
 import { NextResponse } from 'next/server'
 
 const AFN_CONTEXT = `Voce e a IA da A Farmacia Natural (AFN), marca brasileira de nutraceuticos premium para mulheres 25+.
@@ -53,4 +56,9 @@ export async function POST(request) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
+}
+
+
+export async function GET() {
+  return NextResponse.json({ status: 'ok', route: 'ai' })
 }
