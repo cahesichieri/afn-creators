@@ -25,7 +25,7 @@ export default function Campanhas() {
 
   async function carregar() {
     const [{ data: cs }, { data: camps }, { data: ps }] = await Promise.all([
-      supabase.from('creators').select('id,nome').eq('status','ativa').order('nome'),
+      supabase.from('creators').select('id,nome').in('status',['ativa','recrutamento']).order('nome'),
       supabase.from('campanhas').select('*,creators(nome),produtos(nome)').order('created_at',{ascending:false}).limit(50),
       supabase.from('produtos').select('id,nome').eq('ativo',true),
     ])

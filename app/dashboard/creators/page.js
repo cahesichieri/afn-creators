@@ -12,6 +12,7 @@ export default function Creators() {
   const [editando, setEditando] = useState(null)
   const [form, setForm] = useState({ nome:'', instagram:'', nicho:'', seguidores:'', cidade:'', produto_id:'', comissao_pct:15, status:'ativa', data_inicio:'', obs_internas:'' })
   const [busca, setBusca] = useState('')
+  const [selecionados, setSelecionados] = useState([])
   const [salvando, setSalvando] = useState(false)
 
   useEffect(() => { carregar() }, [])
@@ -47,6 +48,23 @@ export default function Creators() {
     carregar()
   }
 
+
+  function toggleSelecao(id) {
+    setSelecionados(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
+  }
+  function toggleTodos() {
+    if (selecionados.length === filtradas.length) setSelecionados([])
+    else setSelecionados(filtradas.map(c => c.id))
+  }
+  async function acaoEmMassa(status) {
+    if (!selecionados.length) return
+    const label = status === 'ativa' ? 'ativar' : 'rejeitar'
+    if (!confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} ${selecionados.length} creator(s)?`)) return
+    await Promise.all(selecionados.map(id => supabase.from('creators').update({ status }).eq('id', id)))
+    setSelecionados([])
+    carregar()
+  }
+
   const filtradas = creators.filter(c => c.nome.toLowerCase().includes(busca.toLowerCase()) || (c.instagram||'').toLowerCase().includes(busca.toLowerCase()))
 
   const fld = (label, id, type='text', opts=null) => (
@@ -70,7 +88,12 @@ export default function Creators() {
         <div style={{fontSize:'.6rem',textTransform:'uppercase',letterSpacing:'.2em',color:'var(--teal)',fontWeight:700}}>
           {filtradas.length} creator{filtradas.length!==1?'s':''} cadastrada{filtradas.length!==1?'s':''}
         </div>
-        <div style={{display:'flex',gap:10}}>
+        <div style={{display:'flex',gap:10,alignItems:'center'}}>
+          {selecionados.length > 0 && (<>
+            <span style={{fontSize:'.72rem',color:'var(--ink3)',fontWeight:600}}>{selecionados.length} selecionada(s)</span>
+            <button onClick={()=>acaoEmMassa('ativa')} style={{background:'var(--green)',color:'#fff',border:'none',borderRadius:4,padding:'7px 14px',fontSize:'.72rem',fontWeight:600}}>✓ Ativar</button>
+            <button onClick={()=>acaoEmMassa('inativa')} style={{background:'var(--red)',color:'#fff',border:'none',borderRadius:4,padding:'7px 14px',fontSize:'.72rem',fontWeight:600}}>✕ Rejeitar</button>
+          </>)}
           <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por nome ou @..."
             style={{padding:'8px 12px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.78rem',background:'var(--card)',outline:'none',width:220}}/>
           <button onClick={()=>abrir()} style={{background:'var(--navy)',color:'#fff',border:'none',borderRadius:4,padding:'8px 16px',fontSize:'.75rem',fontWeight:600}}>

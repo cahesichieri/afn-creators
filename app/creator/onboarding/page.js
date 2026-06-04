@@ -100,12 +100,17 @@ export default function Onboarding() {
       return
     }
     setEnviando(true)
-    await supabase.from('onboarding').insert({
+    const { error } = await supabase.from('onboarding').insert({
       creator_id: creator.id,
       respostas,
       status: 'pendente'
     })
     setEnviando(false)
+    if (error) {
+      console.error('Erro onboarding:', error)
+      alert('Erro ao salvar: ' + error.message + '. Tente novamente.')
+      return
+    }
     setConcluido(true)
   }
 

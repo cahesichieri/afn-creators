@@ -16,19 +16,24 @@ export default function PortalCreator() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push('/login'); return }
-      const userId = session.user.id
-      supabase.from('creators').select('*,produtos(nome)').eq('user_id', userId).single().then(({ data: c, error }) => {
-        if (error || !c) { setCarregando(false); return }
-        setCreator(c)
-        setCarregando(false)
-        supabase.from('campanhas').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}).then(({data:cs})=>setCampanhas(cs||[]))
-        supabase.from('roteiros').select('*').eq('creator_id',c.id).order('data_post',{ascending:true}).then(({data:rs})=>setRoteiros(rs||[]))
-        supabase.from('comissoes').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}).then(({data:cms})=>setComissoes(cms||[]))
-        supabase.from('onboarding').select('id').eq('creator_id',c.id).single().then(({data:ob})=>{ if(!ob) setSemOnboarding(true) })
-      })
-    })
+      const uid = session.user.id
+      const { data: c } = await supabase.from('creators').select('*,produtos(nome)').eq('user_id', uid).single()
+      if (!c) { setCarregando(false); return }
+      setCreator(c)
+      setCarregando(false)
+      const [{ data: cs }, { data: rs }, { data: cms }, { data: ob }] = await Promise.all([
+        supabase.from('campanhas').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}),
+        supabase.from('roteiros').select('*').eq('creator_id',c.id).order('data_post',{ascending:true}),
+        supabase.from('comissoes').select('*').eq('creator_id',c.id).order('created_at',{ascending:false}),
+        supabase.from('onboarding').select('id').eq('creator_id',c.id).single()
+      ])
+      setCampanhas(cs||[]); setRoteiros(rs||[]); setComissoes(cms||[])
+      if (!ob) setSemOnboarding(true)
+    }
+    init()
   }, [])
 
   async function sair() { await supabase.auth.signOut(); router.push('/login') }
@@ -46,7 +51,7 @@ export default function PortalCreator() {
       <div style={{maxWidth:440,background:'var(--card)',border:'1px solid var(--rule)',borderRadius:8,padding:32,textAlign:'center'}}>
         <div style={{fontSize:'2.5rem',marginBottom:16}}>⚠️</div>
         <h2 style={{fontFamily:'var(--serif)',fontSize:'1.2rem',fontWeight:700,color:'var(--teal)',marginBottom:12}}>Perfil em processamento</h2>
-        <p style={{fontSize:'.85rem',color:'var(--ink2)',lineHeight:1.6,marginBottom:24}}>Seu cadastro foi recebido! Clique em Tentar novamente ou recarregue a página.</p>
+        <p style={{fontSize:'.85rem',color:'var(--ink2)',lineHeight:1.6,marginBottom:24}}>Seu cadastro foi recebido! Clique em Tentar novamente ou recarregue a pagina.</p>
         <button onClick={()=>window.location.reload()} style={{background:'var(--teal)',color:'#fff',border:'none',borderRadius:4,padding:'10px 24px',fontSize:'.85rem',fontWeight:600,cursor:'pointer',marginRight:8}}>Tentar novamente</button>
         <button onClick={sair} style={{background:'transparent',color:'var(--ink3)',border:'1px solid var(--rule)',borderRadius:4,padding:'10px 24px',fontSize:'.85rem',cursor:'pointer'}}>Sair</button>
       </div>
@@ -57,11 +62,11 @@ export default function PortalCreator() {
     <div style={{minHeight:'100vh',background:'var(--bg)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
       <div style={{maxWidth:480,background:'var(--card)',border:'1px solid var(--rule)',borderRadius:8,overflow:'hidden'}}>
         <div style={{background:'var(--navy)',padding:'28px 32px'}}>
-          <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:8}}>A Farmácia Natural</div>
+          <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:8}}>A Farmacia Natural</div>
           <div style={{fontFamily:'var(--serif)',fontSize:'1.8rem',fontWeight:700,color:'#fff',lineHeight:1.1}}>Bem-vinda,<br/>{creator.nome.split(' ')[0]}! 🌿</div>
         </div>
         <div style={{padding:'28px 32px'}}>
-          <p style={{fontSize:'.85rem',color:'var(--ink2)',lineHeight:1.7,marginBottom:24}}>Antes de começar, precisamos conhecer melhor você e o seu público. Isso leva menos de 5 minutos.</p>
+          <p style={{fontSize:'.85rem',color:'var(--ink2)',lineHeight:1.7,marginBottom:24}}>Antes de comecar, precisamos conhecer melhor voce e o seu publico. Isso leva menos de 5 minutos.</p>
           <a href="/creator/onboarding" style={{display:'block',background:'var(--navy)',color:'#fff',border:'none',borderRadius:4,padding:'12px',fontSize:'.85rem',fontWeight:700,textAlign:'center',textDecoration:'none'}}>Preencher meu perfil →</a>
         </div>
       </div>
@@ -78,23 +83,23 @@ export default function PortalCreator() {
     <div style={{minHeight:'100vh',background:'var(--bg)'}}>
       <div style={{background:'var(--navy)',padding:'16px 32px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div>
-          <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:3}}>A Farmácia Natural</div>
-          <div style={{fontSize:'.9rem',fontWeight:700,color:'#fff'}}>Olá, {creator.nome.split(' ')[0]} 👋</div>
+          <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:3}}>A Farmacia Natural</div>
+          <div style={{fontSize:'.9rem',fontWeight:700,color:'#fff'}}>Ola, {creator.nome.split(' ')[0]} 👋</div>
         </div>
         <a href="/creator/bancario" style={{fontSize:'.7rem',color:'rgba(255,255,255,.6)',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.15)',borderRadius:3,padding:'5px 12px',textDecoration:'none',marginRight:8}}>Dados bancarios</a>
         <button onClick={sair} style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',background:'none',border:'1px solid rgba(255,255,255,.1)',borderRadius:3,padding:'5px 12px'}}>Sair</button>
       </div>
       <div style={{padding:'24px 32px'}}>
         <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:24}}>
-          {[['Campanhas',campanhas.length,'var(--teal-d)'],['Receita Gerada',`R$${fmt(totalReceita)}`,'var(--green)'],['A Receber',`R$${fmt(totalComissoes)}`,'var(--amber)'],['Já Recebido',`R$${fmt(totalPago)}`,'var(--navy)']].map(([l,v,c])=>(
-            <div key={l} style={{background:'var(--card)',border:'1px solid var(--rule)',borderTop:`3px solid ${c}`,borderRadius:6,padding:'14px 16px'}}>
+          {[['Campanhas',campanhas.length,'var(--teal-d)'],['Receita Gerada','R$'+fmt(totalReceita),'var(--green)'],['A Receber','R$'+fmt(totalComissoes),'var(--amber)'],['Ja Recebido','R$'+fmt(totalPago),'var(--navy)']].map(([l,v,c])=>(
+            <div key={l} style={{background:'var(--card)',border:'1px solid var(--rule)',borderTop:'3px solid '+c,borderRadius:6,padding:'14px 16px'}}>
               <div style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.12em',color:'var(--ink3)',fontWeight:700,marginBottom:6}}>{l}</div>
               <div style={{fontFamily:'var(--serif)',fontSize:'1.5rem',fontWeight:700,color:c,lineHeight:1}}>{v}</div>
             </div>
           ))}
         </div>
         <div style={{display:'flex',gap:0,border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden',marginBottom:20,background:'var(--card)'}}>
-          {[['metricas','📊 Métricas'],['roteiros','📝 Roteiros'],['comissoes','💰 Comissões']].map(([id,label])=>(
+          {[['metricas','📊 Metricas'],['roteiros','📝 Roteiros'],['comissoes','💰 Comissoes']].map(([id,label])=>(
             <button key={id} onClick={()=>setAba(id)} style={{flex:1,padding:'10px',fontSize:'.76rem',fontWeight:600,color:aba===id?'#fff':'var(--ink3)',background:aba===id?'var(--navy)':'transparent',border:'none',borderRight:'1px solid var(--rule)'}}>{label}</button>
           ))}
         </div>
@@ -102,7 +107,7 @@ export default function PortalCreator() {
           <div style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
             {campanhas.length===0 ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem'}}>Nenhuma campanha ainda.</div> : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
-                <thead><tr style={{borderBottom:'2px solid var(--navy)'}}>{['Período','Leads','Vendas','Conversão','Receita'].map(h=><th key={h} style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700,padding:'10px 14px',textAlign:'left',background:'var(--bg)'}}>{h}</th>)}</tr></thead>
+                <thead><tr style={{borderBottom:'2px solid var(--navy)'}}>{['Periodo','Leads','Vendas','Conversao','Receita'].map(h=><th key={h} style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700,padding:'10px 14px',textAlign:'left',background:'var(--bg)'}}>{h}</th>)}</tr></thead>
                 <tbody>{campanhas.map(c=>{ const conv=c.leads>0?(c.pedidos_pagos/c.leads*100).toFixed(1):0; return <tr key={c.id} style={{borderBottom:'1px solid var(--rule)'}}><td style={{padding:'10px 14px',fontWeight:600,fontSize:'.82rem'}}>{c.periodo}</td><td style={{padding:'10px 14px',fontSize:'.76rem',color:'var(--ink2)'}}>{(c.leads||0).toLocaleString('pt-BR')}</td><td style={{padding:'10px 14px',fontSize:'.76rem',color:'var(--ink2)'}}>{c.pedidos_pagos||0}</td><td style={{padding:'10px 14px'}}><span style={{fontSize:'.62rem',fontWeight:700,padding:'3px 8px',borderRadius:3,background:parseFloat(conv)>=5?'var(--green-lt)':parseFloat(conv)>=2?'var(--amber-lt)':'var(--red-lt)',color:parseFloat(conv)>=5?'var(--green)':parseFloat(conv)>=2?'var(--amber)':'var(--red)'}}>{conv}%</span></td><td style={{padding:'10px 14px',fontSize:'.76rem',color:'var(--green)',fontWeight:600}}>R$ {fmt(c.receita)}</td></tr>})}</tbody>
               </table>
             )}
@@ -110,7 +115,7 @@ export default function PortalCreator() {
         )}
         {aba==='roteiros' && (
           <div style={{display:'grid',gap:10}}>
-            {roteiros.length===0 ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem',background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6}}>Nenhum roteiro disponível.</div>
+            {roteiros.length===0 ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem',background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6}}>Nenhum roteiro disponivel.</div>
             : roteiros.map(r=>(
               <div key={r.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
                 <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:'var(--bg)',borderBottom:'1px solid var(--rule)'}}>
@@ -132,9 +137,9 @@ export default function PortalCreator() {
         )}
         {aba==='comissoes' && (
           <div style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
-            {comissoes.length===0 ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem'}}>Nenhuma comissão ainda.</div> : (
+            {comissoes.length===0 ? <div style={{textAlign:'center',padding:40,color:'var(--ink3)',fontSize:'.78rem'}}>Nenhuma comissao ainda.</div> : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
-                <thead><tr style={{borderBottom:'2px solid var(--navy)'}}>{['Período','Valor','Status','Data Pgto'].map(h=><th key={h} style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700,padding:'10px 14px',textAlign:'left',background:'var(--bg)'}}>{h}</th>)}</tr></thead>
+                <thead><tr style={{borderBottom:'2px solid var(--navy)'}}>{['Periodo','Valor','Status','Data Pgto'].map(h=><th key={h} style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700,padding:'10px 14px',textAlign:'left',background:'var(--bg)'}}>{h}</th>)}</tr></thead>
                 <tbody>{comissoes.map(c=>(<tr key={c.id} style={{borderBottom:'1px solid var(--rule)'}}><td style={{padding:'10px 14px',fontWeight:600,fontSize:'.82rem'}}>{c.mes_referencia}</td><td style={{padding:'10px 14px',fontSize:'.76rem',color:'var(--green)',fontWeight:600}}>R$ {fmt(c.valor_liquido)}</td><td style={{padding:'10px 14px'}}><span style={{fontSize:'.6rem',fontWeight:700,padding:'3px 8px',borderRadius:3,background:c.status==='pago'?'var(--green-lt)':'var(--amber-lt)',color:c.status==='pago'?'var(--green)':'var(--amber)'}}>{c.status}</span></td><td style={{padding:'10px 14px',fontSize:'.76rem',color:'var(--ink3)'}}>{c.data_pagamento||'Pendente'}</td></tr>))}</tbody>
               </table>
             )}
