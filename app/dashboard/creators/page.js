@@ -36,7 +36,7 @@ export default function Creators() {
   async function salvar() {
     if (!form.nome) return
     setSalvando(true)
-    const payload = { ...form, seguidores: parseInt(form.seguidores)||0, comissao_pct: parseFloat(form.comissao_pct)||15 }
+    const payload = { ...form, seguidores: parseInt(form.seguidores)||0, comissao_pct: parseFloat(form.comissao_pct)||15, produto_id: form.produto_id || null }
     if (editando) await supabase.from('creators').update(payload).eq('id', editando.id)
     else await supabase.from('creators').insert(payload)
     setSalvando(false); setModal(false); carregar()

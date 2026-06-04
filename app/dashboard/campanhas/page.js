@@ -13,7 +13,7 @@ export default function Campanhas() {
   const [analisando, setAnalisando] = useState(false)
   const [uploads, setUploads] = useState([])
   const [form, setForm] = useState({
-    creator_id:'', periodo:'', fonte:'manual', produto_id:'',
+    creator_id:null, periodo:'', fonte:'manual', produto_id:null,
     leads:0, checkouts:0, pedidos_gerados:0, pedidos_pagos:0, receita:0,
     alcance:0, impressoes:0, views_reels:0, comentarios:0, dms:0,
     reels:0, stories_cta:0, stories_ind:0, lifestyle:0, lives:0,
@@ -82,7 +82,7 @@ export default function Campanhas() {
     }
     await supabase.from('campanhas').insert(payload)
     setSalvando(false); setModal(false)
-    setForm(f=>({...f,creator_id:'',periodo:'',leads:0,pedidos_pagos:0,receita:0}))
+    setForm(f=>({...f,creator_id:null,periodo:'',leads:0,pedidos_pagos:0,receita:0}))
     setUploads([])
     carregar()
   }
