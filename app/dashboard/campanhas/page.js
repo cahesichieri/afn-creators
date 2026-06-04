@@ -12,8 +12,9 @@ export default function Campanhas() {
   const [salvando, setSalvando] = useState(false)
   const [analisando, setAnalisando] = useState(false)
   const [uploads, setUploads] = useState([])
+  const [produtosSelecionados, setProdutosSelecionados] = useState([])
   const [form, setForm] = useState({
-    creator_id:null, periodo:'', fonte:'manual', produto_id:null,
+    creator_id:null, data_inicio:'', data_fim:'', fonte:'manual', produto_id:null,
     leads:0, checkouts:0, pedidos_gerados:0, pedidos_pagos:0, receita:0,
     alcance:0, impressoes:0, views_reels:0, comentarios:0, dms:0,
     reels:0, stories_cta:0, stories_ind:0, lifestyle:0, lives:0,
@@ -69,20 +70,34 @@ export default function Campanhas() {
     setAnalisando(false)
   }
 
+  function periodoFormatado() {
+    if (!form.data_inicio) return ''
+    if (!form.data_fim) return form.data_inicio
+    const fmt = d => { const [y,m,dia]=d.split('-'); return `${dia}/${m}/${y}` }
+    return `${fmt(form.data_inicio)} a ${fmt(form.data_fim)}`
+  }
+
   async function salvar() {
-    if (!form.creator_id || !form.periodo) { alert('Creator e período são obrigatórios.'); return }
+    if (!form.creator_id || !form.data_inicio) { alert('Creator e data de início são obrigatórios.'); return }
     setSalvando(true)
-    const payload = { ...form,
+    const periodo = periodoFormatado()
+    const produto_id = produtosSelecionados[0] || null
+    const produtos_nomes = produtosSelecionados.map(id => produtos.find(p=>p.id===id)?.nome).filter(Boolean).join(', ')
+    const payload = { ...form, periodo, produto_id,
       leads:n('leads'), checkouts:n('checkouts'),
       pedidos_gerados:n('pedidos_gerados'), pedidos_pagos:n('pedidos_pagos'),
       receita:n('receita'), alcance:n('alcance'), impressoes:n('impressoes'),
       views_reels:n('views_reels'), comentarios:n('comentarios'), dms:n('dms'),
       reels:n('reels'), stories_cta:n('stories_cta'), stories_ind:n('stories_ind'),
       lifestyle:n('lifestyle'), lives:n('lives'),
+      observacoes: produtos_nomes ? `Produtos: ${produtos_nomes}${form.observacoes ? '\n'+form.observacoes : ''}` : form.observacoes,
     }
+    delete payload.data_inicio
+    delete payload.data_fim
     await supabase.from('campanhas').insert(payload)
     setSalvando(false); setModal(false)
-    setForm(f=>({...f,creator_id:null,periodo:'',leads:0,pedidos_pagos:0,receita:0}))
+    setForm(f=>({...f,creator_id:null,data_inicio:'',data_fim:'',leads:0,pedidos_pagos:0,receita:0}))
+    setProdutosSelecionados([])
     setUploads([])
     carregar()
   }
@@ -173,9 +188,30 @@ export default function Campanhas() {
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:20}}>
                 {fld('Creator','creator_id','text',false,[{v:'',l:'Selecionar creator...'},...creators.map(c=>({v:c.id,l:c.nome}))])}
-                {fld('Período','periodo')}
-                {fld('Produto','produto_id','text',false,[{v:'',l:'Selecionar produto...'},...produtos.map(p=>({v:p.id,l:p.nome}))])}
                 {fld('Fonte','fonte','text',false,[{v:'manual',l:'Manual'},{v:'prints_ia',l:'Prints IA'},{v:'partnership_ads',l:'Partnership Ads'}])}
+                {fld('Início da campanha','data_inicio','date')}
+                {fld('Fim da campanha','data_fim','date')}
+              </div>
+
+              {/* PRODUTOS */}
+              <div style={{marginBottom:20}}>
+                <div style={{fontSize:'.62rem',textTransform:'uppercase',letterSpacing:'.12em',color:'var(--navy)',fontWeight:700,marginBottom:10,display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{width:3,height:12,background:'var(--teal)',borderRadius:2,display:'inline-block'}}/>Produtos da campanha
+                  {produtosSelecionados.length>0 && <span style={{fontSize:'.62rem',color:'var(--teal-d)',fontWeight:600,marginLeft:4}}>({produtosSelecionados.length} selecionado{produtosSelecionados.length>1?'s':''})</span>}
+                </div>
+                <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                  {produtos.map(p=>{
+                    const sel = produtosSelecionados.includes(p.id)
+                    return (
+                      <label key={p.id} style={{display:'flex',alignItems:'center',gap:6,padding:'7px 12px',border:`1px solid ${sel?'var(--teal-d)':'var(--rule)'}`,borderRadius:4,background:sel?'var(--teal-lt)':'var(--bg)',cursor:'pointer',fontSize:'.76rem',fontWeight:sel?700:400,color:sel?'var(--teal-d)':'var(--ink2)',transition:'all .15s'}}>
+                        <input type="checkbox" checked={sel}
+                          onChange={()=>setProdutosSelecionados(s=>s.includes(p.id)?s.filter(x=>x!==p.id):[...s,p.id])}
+                          style={{accentColor:'var(--teal-d)',width:13,height:13}}/>
+                        {p.nome}
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
 
               {/* UPLOAD PRINTS */}

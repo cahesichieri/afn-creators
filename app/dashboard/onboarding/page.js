@@ -210,9 +210,15 @@ Responda APENAS com JSON válido, sem markdown:
                   </>
                 )}
                 {ob.status === 'aprovado' && (
-                  <div style={{fontSize:'.78rem',color:'var(--green)',fontWeight:600}}>
-                    ✓ Aprovado em {new Date(ob.aprovado_em).toLocaleDateString('pt-BR')}
-                  </div>
+                  <>
+                    <button onClick={() => analisarComIA(ob)} disabled={analisando === ob.id}
+                      style={{background:'transparent',color:'var(--ink3)',border:'1px solid var(--rule)',borderRadius:4,padding:'9px 16px',fontSize:'.75rem'}}>
+                      {analisando === ob.id ? '⏳ Reanalisando...' : '↺ Reanalisar'}
+                    </button>
+                    <div style={{fontSize:'.78rem',color:'var(--green)',fontWeight:600,display:'flex',alignItems:'center'}}>
+                      ✓ Aprovado em {new Date(ob.aprovado_em).toLocaleDateString('pt-BR')}
+                    </div>
+                  </>
                 )}
               </div>
             </div>

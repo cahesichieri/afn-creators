@@ -15,7 +15,17 @@ export default function Login() {
     setLoading(true)
     setErro('')
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha })
-    if (error) { setErro('E-mail ou senha incorretos.'); setLoading(false); return }
+    if (error) {
+      const msg = error.message?.toLowerCase() || ''
+      if (msg.includes('rate') || msg.includes('too many') || msg.includes('limit')) {
+        setErro('Muitas tentativas seguidas. Aguarde 30 segundos e tente novamente.')
+      } else if (msg.includes('invalid') || msg.includes('email') || msg.includes('password') || msg.includes('credentials')) {
+        setErro('E-mail ou senha incorretos.')
+      } else {
+        setErro('Erro ao entrar. Tente novamente em alguns segundos.')
+      }
+      setLoading(false); return
+    }
     const userId = data.user?.id
     const { data: p } = await supabase.from('perfis').select('tipo').eq('id', userId).single()
     if (p?.tipo === 'creator') { router.push('/creator') }

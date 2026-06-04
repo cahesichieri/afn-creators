@@ -111,13 +111,25 @@ export default function Creators() {
         ) : (
           <table style={{width:'100%',borderCollapse:'collapse'}}>
             <thead><tr style={{borderBottom:'2px solid var(--navy)'}}>
+              <th style={{padding:'11px 14px',background:'var(--bg)',width:36}}>
+                <input type="checkbox"
+                  checked={filtradas.length>0 && selecionados.length===filtradas.length}
+                  onChange={toggleTodos}
+                  style={{cursor:'pointer',accentColor:'var(--navy)',width:14,height:14}}/>
+              </th>
               {['Nome','Instagram','Nicho','Seguidores','Produto','Comissão','Status','Ações'].map(h=>(
                 <th key={h} style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700,padding:'11px 14px',textAlign:'left',background:'var(--bg)'}}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {filtradas.map(c=>(
-                <tr key={c.id} style={{borderBottom:'1px solid var(--rule)'}}>
+                <tr key={c.id} style={{borderBottom:'1px solid var(--rule)',background:selecionados.includes(c.id)?'var(--navy-xs)':''}}>
+                  <td style={{padding:'11px 14px'}}>
+                    <input type="checkbox"
+                      checked={selecionados.includes(c.id)}
+                      onChange={()=>toggleSelecao(c.id)}
+                      style={{cursor:'pointer',accentColor:'var(--navy)',width:14,height:14}}/>
+                  </td>
                   <td style={{padding:'11px 14px',fontWeight:600,color:'var(--ink)'}}>{c.nome}</td>
                   <td style={{padding:'11px 14px',fontSize:'.76rem',color:'var(--teal-d)'}}>@{c.instagram||'—'}</td>
                   <td style={{padding:'11px 14px',fontSize:'.76rem',color:'var(--ink2)'}}>{c.nicho||'—'}</td>

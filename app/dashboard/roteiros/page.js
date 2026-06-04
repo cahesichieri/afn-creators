@@ -48,9 +48,12 @@ Retorne APENAS um JSON válido sem markdown:
 }`}]})
       })
       const d = await res.json()
-      const texto = d.content?.find(b=>b.type==='text')?.text||'{}'
-      const clean = texto.replace(/```json|```/g,'').trim()
-      const parsed = JSON.parse(clean)
+      if (!res.ok || d.error) throw new Error(d.error || 'Erro na API')
+      const texto = d.content?.find(b=>b.type==='text')?.text||''
+      if (!texto) throw new Error('Resposta vazia da IA')
+      const jsonMatch = texto.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error('JSON não encontrado')
+      const parsed = JSON.parse(jsonMatch[0])
       setForm(f=>({...f,...parsed, gerado_por_ia:true}))
     } catch(e) { alert('Erro ao gerar roteiro.') }
     setGerando(false)
