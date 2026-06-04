@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens, system: system ? AFN + " " + system : AFN, messages })
+      body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens, system: system ? AFN + " " + system : AFN, messages })
     })
     const data = await resp.json()
     if (!resp.ok) return res.status(resp.status).json({ error: data.error?.message || "Erro" })

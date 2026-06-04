@@ -67,9 +67,13 @@ Responda APENAS com JSON válido, sem markdown:
         })
       })
       const data = await res.json()
-      const texto = data.content?.find(b => b.type === 'text')?.text || '{}'
-      const clean = texto.replace(/```json|```/g, '').trim()
-      const rec = JSON.parse(clean)
+      if (!res.ok || data.error) throw new Error(data.error || 'Erro na API')
+      const texto = data.content?.find(b => b.type === 'text')?.text || ''
+      if (!texto) throw new Error('Resposta vazia da IA')
+      // extrai JSON mesmo que venha com markdown ou texto extra
+      const jsonMatch = texto.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error('JSON não encontrado na resposta')
+      const rec = JSON.parse(jsonMatch[0])
 
       const p1 = produtos.find(p => p.nome.toLowerCase().includes(rec.produto_1?.toLowerCase().replace('+','').trim()))
       const p2 = produtos.find(p => p.nome.toLowerCase().includes(rec.produto_2?.toLowerCase().replace('+','').trim()))
