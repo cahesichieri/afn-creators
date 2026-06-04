@@ -18,6 +18,7 @@ const nav = [
 export default function DashboardLayout({ children }) {
   const [perfil, setPerfil] = useState(null)
   const [total, setTotal] = useState(0)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const router = useRouter()
   const path = usePathname()
 
@@ -31,6 +32,9 @@ export default function DashboardLayout({ children }) {
       .then(({ count }) => setTotal(count||0))
   }, [])
 
+  // Fecha drawer ao navegar
+  useEffect(() => { setDrawerOpen(false) }, [path])
+
   async function sair() {
     await supabase.auth.signOut()
     router.push('/login')
@@ -38,32 +42,75 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="dash-layout">
+
+      {/* DESKTOP SIDEBAR */}
       <aside className="dash-sidebar">
-        <div className="dash-sidebar-logo" style={{padding:'24px 22px 20px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
+        <div style={{padding:'24px 22px 20px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
           <div style={{fontFamily:'var(--serif)',fontSize:'.72rem',fontWeight:600,letterSpacing:'.2em',textTransform:'uppercase',color:'var(--teal)',marginBottom:4}}>A Farmácia Natural</div>
           <div style={{fontSize:'.88rem',fontWeight:700,color:'#fff'}}>Creator Platform</div>
         </div>
-        <div className="dash-sidebar-menu" style={{padding:'8px 0',flex:1}}>
-          <div className="dash-sidebar-menu-label" style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.18em',color:'rgba(255,255,255,.25)',fontWeight:700,padding:'12px 22px 6px'}}>Menu</div>
+        <div style={{padding:'8px 0',flex:1}}>
+          <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.18em',color:'rgba(255,255,255,.25)',fontWeight:700,padding:'12px 22px 6px'}}>Menu</div>
           {nav.map(item => {
             const active = path === item.href || (item.href !== '/dashboard' && path.startsWith(item.href))
             return (
-              <Link key={item.href} href={item.href} className={active?'active':''} style={{display:'flex',alignItems:'center',gap:9,padding:'9px 22px',fontSize:'.78rem',fontWeight:500,color:active?'#fff':'rgba(255,255,255,.5)',borderLeft:active?'2px solid var(--teal)':'2px solid transparent',background:active?'rgba(66,194,214,.1)':'transparent',transition:'all .15s'}}>
+              <Link key={item.href} href={item.href} style={{display:'flex',alignItems:'center',gap:9,padding:'9px 22px',fontSize:'.78rem',fontWeight:500,color:active?'#fff':'rgba(255,255,255,.5)',borderLeft:active?'2px solid var(--teal)':'2px solid transparent',background:active?'rgba(66,194,214,.1)':'transparent',transition:'all .15s'}}>
                 <span style={{fontSize:'.85rem',width:16,textAlign:'center'}}>{item.icon}</span>
                 {item.label}
               </Link>
             )
           })}
         </div>
-        <div className="dash-sidebar-footer" style={{padding:'16px 22px',borderTop:'1px solid rgba(255,255,255,.08)'}}>
+        <div style={{padding:'16px 22px',borderTop:'1px solid rgba(255,255,255,.08)'}}>
           <div style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.12em',color:'rgba(255,255,255,.25)',marginBottom:4}}>Creators ativas</div>
           <div style={{fontFamily:'var(--serif)',fontSize:'1.6rem',fontWeight:700,color:'var(--teal)',lineHeight:1,marginBottom:12}}>{total}</div>
           {perfil && <div style={{fontSize:'.68rem',color:'rgba(255,255,255,.4)',marginBottom:8}}>{perfil.nome} · {perfil.tipo}</div>}
           <button onClick={sair} style={{fontSize:'.68rem',color:'rgba(255,255,255,.35)',background:'none',border:'1px solid rgba(255,255,255,.1)',borderRadius:3,padding:'5px 10px',width:'100%'}}>Sair</button>
         </div>
       </aside>
+
+      {/* MOBILE DRAWER OVERLAY */}
+      {drawerOpen && (
+        <div className="dash-overlay" onClick={() => setDrawerOpen(false)} />
+      )}
+
+      {/* MOBILE DRAWER */}
+      <div className={`dash-drawer${drawerOpen ? ' open' : ''}`}>
+        <div style={{padding:'20px 20px 16px',borderBottom:'1px solid rgba(255,255,255,.08)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div>
+            <div style={{fontFamily:'var(--serif)',fontSize:'.7rem',fontWeight:600,letterSpacing:'.18em',textTransform:'uppercase',color:'var(--teal)',marginBottom:2}}>A Farmácia Natural</div>
+            <div style={{fontSize:'.85rem',fontWeight:700,color:'#fff'}}>Creator Platform</div>
+          </div>
+          <button onClick={() => setDrawerOpen(false)} style={{background:'none',border:'none',color:'rgba(255,255,255,.5)',fontSize:'1.4rem',lineHeight:1,padding:'4px'}}>✕</button>
+        </div>
+        <div style={{flex:1,padding:'8px 0',overflowY:'auto'}}>
+          {nav.map(item => {
+            const active = path === item.href || (item.href !== '/dashboard' && path.startsWith(item.href))
+            return (
+              <Link key={item.href} href={item.href} style={{display:'flex',alignItems:'center',gap:12,padding:'13px 20px',fontSize:'.84rem',fontWeight:500,color:active?'#fff':'rgba(255,255,255,.6)',borderLeft:active?'3px solid var(--teal)':'3px solid transparent',background:active?'rgba(66,194,214,.1)':'transparent'}}>
+                <span style={{fontSize:'1rem',width:20,textAlign:'center'}}>{item.icon}</span>
+                {item.label}
+              </Link>
+            )
+          })}
+        </div>
+        <div style={{padding:'16px 20px',borderTop:'1px solid rgba(255,255,255,.08)'}}>
+          <div style={{fontSize:'.6rem',textTransform:'uppercase',letterSpacing:'.1em',color:'rgba(255,255,255,.25)',marginBottom:2}}>Creators ativas</div>
+          <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--teal)',marginBottom:10}}>{total}</div>
+          {perfil && <div style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',marginBottom:8}}>{perfil.nome} · {perfil.tipo}</div>}
+          <button onClick={sair} style={{fontSize:'.7rem',color:'rgba(255,255,255,.35)',background:'none',border:'1px solid rgba(255,255,255,.1)',borderRadius:3,padding:'6px 12px',width:'100%'}}>Sair</button>
+        </div>
+      </div>
+
+      {/* MAIN */}
       <main className="dash-main">
         <div className="dash-topbar" style={{background:'var(--card)',borderBottom:'1px solid var(--rule)',padding:'14px 32px',position:'sticky',top:0,zIndex:10,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          {/* Hamburger — mobile only */}
+          <button className="dash-hamburger" onClick={() => setDrawerOpen(true)} style={{display:'none',background:'none',border:'none',padding:'4px 8px 4px 0',marginRight:8,flexShrink:0}}>
+            <div style={{width:22,height:2,background:'var(--navy)',marginBottom:5,borderRadius:2}} />
+            <div style={{width:22,height:2,background:'var(--navy)',marginBottom:5,borderRadius:2}} />
+            <div style={{width:22,height:2,background:'var(--navy)',borderRadius:2}} />
+          </button>
           <div>
             <div style={{fontFamily:'var(--serif)',fontSize:'1.2rem',fontWeight:700,color:'var(--navy)'}}>AFN · <span style={{color:'var(--teal-d)'}}>Creator Platform</span></div>
             <div style={{fontSize:'.65rem',color:'var(--ink3)',textTransform:'uppercase',letterSpacing:'.1em'}}>Performance · Conteúdo · Conversão</div>

@@ -15,24 +15,32 @@ a{color:inherit;text-decoration:none;}
 button{cursor:pointer;font-family:var(--font);}
 input,select,textarea{font-family:var(--font);}
 
-/* ── ADMIN DASHBOARD — RESPONSIVE ─────────────────────────────── */
+/* ── ADMIN DASHBOARD — LAYOUT ──────────────────────────────────── */
 .dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
 .dash-sidebar{background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
 .dash-main{background:var(--bg);overflow-y:auto;}
 
+/* Drawer — hidden on desktop */
+.dash-drawer{display:none;}
+.dash-overlay{display:none;}
+
 @media(max-width:768px){
-  .dash-layout{grid-template-columns:1fr;grid-template-rows:1fr auto;}
-  .dash-sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;flex-direction:row;z-index:100;border-top:1px solid rgba(255,255,255,.12);padding:0;}
-  .dash-sidebar-logo{display:none;}
-  .dash-sidebar-menu{display:flex;flex-direction:row;flex:1;overflow-x:auto;padding:0;}
-  .dash-sidebar-menu a{flex-direction:column;gap:3px;padding:8px 10px;font-size:.58rem;min-width:60px;text-align:center;border-left:none!important;border-top:2px solid transparent;}
-  .dash-sidebar-menu a.active{border-top-color:var(--teal);border-left:none!important;}
-  .dash-sidebar-menu a span:first-child{font-size:1.1rem;width:auto;}
-  .dash-sidebar-footer{display:none;}
-  .dash-sidebar-menu-label{display:none;}
-  .dash-sidebar-menu{padding:0!important;}
-  .dash-main{padding-bottom:70px;}
-  .dash-topbar{padding:10px 16px!important;}
+  .dash-layout{grid-template-columns:1fr;}
+  .dash-sidebar{display:none;}
+  .dash-topbar{padding:12px 16px!important;}
+  .dash-hamburger{display:flex!important;flex-direction:column;}
+
+  /* Overlay escuro atrás do drawer */
+  .dash-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;}
+
+  /* Drawer lateral */
+  .dash-drawer{
+    display:flex;flex-direction:column;
+    position:fixed;top:0;left:0;bottom:0;width:280px;
+    background:var(--navy);z-index:300;
+    transform:translateX(-100%);transition:transform .25s ease;
+  }
+  .dash-drawer.open{transform:translateX(0);}
 }
 
 /* ── CREATOR PORTAL — RESPONSIVE ──────────────────────────────── */
@@ -41,4 +49,12 @@ input,select,textarea{font-family:var(--font);}
   .creator-tabs{overflow-x:auto;white-space:nowrap;}
   .creator-tabs button{padding:8px 14px!important;font-size:.72rem!important;}
   .creator-card-grid{grid-template-columns:1fr!important;}
+}
+
+/* ── CADASTRO — RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:520px){
+  .cadastro-wrap{padding:0!important;align-items:flex-start!important;}
+  .cadastro-card{width:100%!important;border-radius:0!important;border-left:none!important;border-right:none!important;min-height:100vh;}
+  .cadastro-grid-2{grid-template-columns:1fr!important;}
+  .cadastro-grid-3{grid-template-columns:1fr 1fr!important;}
 }

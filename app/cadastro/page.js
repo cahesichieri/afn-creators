@@ -123,8 +123,8 @@ export default function Cadastro() {
   )
 
   return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f8f7fc', padding:24 }}>
-      <div style={{ width:460, background:'#fff', border:'1px solid #e8e4f0', borderRadius:8, overflow:'hidden' }}>
+    <div className="cadastro-wrap" style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f8f7fc', padding:24 }}>
+      <div className="cadastro-card" style={{ width:460, background:'#fff', border:'1px solid #e8e4f0', borderRadius:8, overflow:'hidden' }}>
         <div style={{ background:'#2d2864', padding:'24px 32px' }}>
           <div style={{ fontSize:'.72rem', fontWeight:600, letterSpacing:'.2em', textTransform:'uppercase', color:'#42c2d6', marginBottom:6 }}>A Farmacia Natural</div>
           <div style={{ fontSize:'1.7rem', fontWeight:700, color:'#fff', lineHeight:1.1, marginBottom:8 }}>{step===1?'Criar conta':step===2?'Seu perfil':'Dados pessoais'}</div>
@@ -148,30 +148,30 @@ export default function Cadastro() {
           </>)}
           {step===2 && (<>
             <Campo label="Instagram" id="instagram" placeholder="@seuinstagram" valor={form.instagram} erro={erros.instagram} onChange={handleChange} />
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div className="cadastro-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <Campo label="Nicho principal" id="nicho" opcoes={NICHOS} valor={form.nicho} erro={erros.nicho} onChange={handleChange} />
               <Campo label="Seguidores" id="seguidores" type="number" placeholder="ex: 15000" valor={form.seguidores} erro={erros.seguidores} onChange={handleChange} />
             </div>
           </>)}
           {step===3 && (<>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div className="cadastro-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <Campo label="CPF" id="cpf" placeholder="000.000.000-00" mascara={mascaraCPF} valor={form.cpf} erro={erros.cpf} onChange={handleChange} />
               <Campo label="Data de nascimento" id="data_nascimento" type="date" valor={form.data_nascimento} erro={erros.data_nascimento} onChange={handleChange} />
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div className="cadastro-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <Campo label="Telefone" id="telefone" placeholder="(00) 00000-0000" mascara={mascaraTel} valor={form.telefone} erro={erros.telefone} onChange={handleChange} />
               <Campo label="WhatsApp" id="whatsapp" placeholder="(00) 00000-0000" mascara={mascaraTel} valor={form.whatsapp} erro={erros.whatsapp} onChange={handleChange} />
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12 }}>
+            <div className="cadastro-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12 }}>
               <Campo label="CEP" id="cep" placeholder="00000-000" mascara={mascaraCEP} valor={form.cep} erro={erros.cep} onChange={(id,val)=>{ handleChange(id,val); buscarCEP(val) }} />
               <Campo label="Endereco" id="endereco" placeholder="Rua, Avenida..." valor={form.endereco} erro={erros.endereco} onChange={handleChange} />
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1fr', gap:12 }}>
+            <div className="cadastro-grid-3" style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1fr', gap:12 }}>
               <Campo label="Numero" id="numero" placeholder="123" valor={form.numero} erro={erros.numero} onChange={handleChange} />
               <Campo label="Complemento" id="complemento" placeholder="Apto..." valor={form.complemento} erro={erros.complemento} onChange={handleChange} />
               <Campo label="Estado" id="estado" placeholder="SP" valor={form.estado} erro={erros.estado} onChange={handleChange} />
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div className="cadastro-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <Campo label="Bairro" id="bairro" placeholder="Bairro" valor={form.bairro} erro={erros.bairro} onChange={handleChange} />
               <Campo label="Cidade" id="cidade" placeholder="Cidade" valor={form.cidade} erro={erros.cidade} onChange={handleChange} />
             </div>
