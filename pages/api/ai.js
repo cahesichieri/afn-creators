@@ -1,6 +1,6 @@
 const AFN = "Voce e a IA da A Farmacia Natural (AFN), marca brasileira de nutraceuticos premium para mulheres 25+. CATALOGO: AFN32+ (R$187,90) Metabolismo/emagrecimento capsulas; AFN77+ (R$390) Longevidade/colageno po 300g; AFN9+ (R$600) Performance/energia capsulas; AFN Nac - Detox/antioxidante; AFN Biotin B7 - Cabelo/pele/unhas. PERSONA: Mulheres 25-55 classe B/C SP. ARQUETIPOS: Sage (Ciencia Simplificada) + Caregiver. TOM: Especialista, moderno, acolhedor, sem promessas miraculosas. ESTRATEGIA: Marketing de Premissas, Reels engaja, Stories converte."
 
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash']
+const MODELS = ['gemini-1.5-flash-latest', 'gemini-1.5-flash-8b-latest']
 
 async function callGemini(apiKey, model, systemPrompt, userMessage, max_tokens) {
   const resp = await fetch(
@@ -35,13 +35,13 @@ export default async function handler(req, res) {
     for (const model of MODELS) {
       const { resp, data } = await callGemini(apiKey, model, systemPrompt, userMessage, max_tokens)
 
-      if (resp.status === 429) {
+      if (resp.status === 429 || resp.status === 404) {
         await new Promise(r => setTimeout(r, 800))
         continue
       }
 
       if (!resp.ok) {
-        return res.status(resp.status).json({ error: data.error?.message || `Erro Gemini (${resp.status})` })
+        return res.status(500).json({ error: `Gemini erro ${resp.status}: ${data.error?.message || 'sem detalhes'}` })
       }
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ content: [{ type: 'text', text }] })
     }
 
-    return res.status(429).json({ error: 'Limite da API de IA atingido. Aguarde 1 minuto e tente novamente.' })
+    return res.status(429).json({ error: 'Limite da API Gemini atingido em todos os modelos. Aguarde 1 minuto e tente novamente.' })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }
