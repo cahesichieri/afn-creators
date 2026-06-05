@@ -30,20 +30,35 @@ export default function Roteiros() {
     setGerando(true)
     const creator = creators.find(c=>c.id===form.creator_id)
     try {
-      const prompt = `Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos. Crie um roteiro condensado para a creator ${creator?.nome||''}.
+      const prompt = `Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos.
 
+CATÁLOGO AFN (use para construir as premissas certas para o produto):
+- AFN 32+ (emagrecimento): Psyllium (saciedade/gel no estômago) + Cromo (controla glicose/compulsão por doce) + Cafeína (energia/metabolismo) + Spirulina (nutrição). Dores: come pouco e não emagrece, compulsão por doce, ciclo glicêmico vicioso.
+- AFN 77+ (intestino/prebiótico): Regula trânsito, equilibra microbiota, reduz inchaço, melhora absorção. Dores: barriga inchada, intestino preso, cansaço, humor afetado.
+- AFN 9+ (libido/vitalidade): B6 (769%VD) + Magnésio + Zinco (100%VD) + Arginina + Saponinas + Boro. Dores: cansaço crônico feminino, sem libido, queda de desempenho.
+- AFN ClearSkin (pele): Vitamina A + Proantocianidinas de Cranberry + Procianidinas + Licopeno. Dores: manchas, melasma, pele opaca, envelhecimento precoce.
+- AFN NAC (detox): N-Acetilcisteína 600mg → precursor de glutationa. Dores: fígado sobrecarregado, imunidade baixa, cansaço tóxico.
+- Biotin B7 (cabelo/unhas): Biotina 45mg. Dores: queda de cabelo, unhas quebradiças, pele sem viço.
+
+REGRA DE OURO DO MARKETING DE PREMISSAS:
+As premissas (premissa_01 a premissa_04) NUNCA mencionam produto, marca ou suplemento.
+Elas falam apenas de dor, causa científica e mecanismo. O produto só aparece no campo "desenvolvimento" (roteiros de conversão).
+Premissas educativas = sem produto. Roteiro de CTA/conversão = produto aparece só no desenvolvimento/cta.
+
+Creator: ${creator?.nome||''}
 Tema: "${form.tema}"
 Tipo: ${form.tipo} | Formato: ${form.formato}
 
 Retorne APENAS um JSON válido sem markdown:
 {
-  "desenvolvimento": "descrição do objetivo do conteúdo em 2 linhas",
-  "gancho_01": "frase de abertura impactante",
-  "premissa_01": "primeira premissa lógica",
-  "premissa_02": "segunda premissa lógica",
-  "premissa_03": "terceira premissa (se aplicável, senão vazio)",
-  "gancho_02": "gancho de fechamento antes do CTA",
-  "cta": "chamada para ação (se for conteúdo de venda, senão vazio)"
+  "desenvolvimento": "objetivo do conteúdo em 2 linhas (se tipo=cta, menciona o produto aqui)",
+  "gancho_01": "frase de abertura que para o scroll — identifica a dor (SEM produto)",
+  "premissa_01": "causa raiz do problema em linguagem acessível (SEM produto)",
+  "premissa_02": "aprofundamento científico simples (SEM produto)",
+  "premissa_03": "terceira premissa ou validação emocional (SEM produto, ou vazio se não couber)",
+  "premissa_04": "quarta premissa com dado científico ou mecanismo (SEM produto, ou vazio)",
+  "gancho_02": "virada — promessa de que existe solução ou chamada para próximo passo",
+  "cta": "chamada para ação (se conversão: menciona produto + onde comprar; se educativo: salva/comenta/segue)"
 }`
       const texto = await callAI({ messages: [{ role: 'user', content: prompt }] })
       const jsonMatch = texto.match(/\{[\s\S]*\}/)

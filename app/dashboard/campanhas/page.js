@@ -367,64 +367,217 @@ function TabEstrategia() {
 
     const prompt = `Você é a IA da A Farmácia Natural (AFN), especialista em Marketing de Premissas para o Instagram.
 
+═══════════════════════════════════════
+CATÁLOGO COMPLETO AFN (use para construir as premissas):
+═══════════════════════════════════════
+
+AFN 32+ — Emagrecimento e metabolismo (cápsulas, R$187,90)
+Ingredientes: Psyllium 400mg (forma gel no estômago → saciedade real), Spirulina 400mg (proteínas, vitaminas, minerais), Cafeína 200mg (energia, alerta, gasto calórico), Picolinato de Cromo 220mcg (controla metabolismo de carboidratos, reduz compulsão por doce)
+Mecanismo: Psyllium expande no estômago → você come menos naturalmente. Cromo equilibra glicose → sem pico de fome nem compulsão por doce. Cafeína aumenta gasto energético. Spirulina nutre.
+Dores que resolve: come pouco e não emagrece, compulsão por doce, fome constante, energia baixa para treinar.
+
+AFN 77+ — Saúde intestinal / prebiótico (pó sabor framboesa, R$390)
+Ingredientes: prebióticos, fibras solúveis (informações nutricionais: carboidratos 5,3g, cálcio, potássio por porção de 10g)
+Mecanismo: Regula trânsito intestinal, equilibra microbiota, reduz inchaço e gases, melhora absorção de nutrientes, reduz compulsão alimentar por doces e carboidratos.
+Dores: barriga sempre inchada, intestino preso/preguiçoso, cansaço sem explicação, absorção ruim de nutrientes, humor afetado.
+
+AFN 9+ — Potencializador natural / libido e vitalidade (cápsulas, R$600)
+Ingredientes: Vitamina B6 10mg (769% VD), Magnésio 80mg, Zinco 7mg (100% VD), Arginina 200mg, Boro 8,86mg, Saponinas (glicosídeos de furostanol) 300mg
+Mecanismo: B6+Magnésio+Zinco = equilíbrio hormonal. Arginina = vasodilatação e circulação. Saponinas de furostanol = precursores hormonais naturais. Boro = testosterona disponível.
+Dores: cansaço crônico feminino, falta de libido, sem disposição para nada, queda de desempenho físico.
+
+AFN ClearSkin — Saúde da pele (cápsulas, 60 cáps/30g)
+Ingredientes: Vitamina A 2.263mcg (283% VD), Proantocianidinas de Cranberry 200mg, Procianidinas 200mg, Licopeno 8mg
+Mecanismo: Vitamina A = renovação celular e regeneração cutânea. Proantocianidinas + Procianidinas = antioxidantes potentes que combatem radicais livres. Licopeno = proteção e uniformização do tom.
+Dores: manchas, melasma, pele opaca, tom desigual, envelhecimento precoce, skincare externo que não resolve.
+
+AFN NAC — Antioxidante e detox (cápsulas, 60 cáps, 600mg L-Cisteína por cápsula)
+Ingredientes: N-Acetilcisteína (NAC) 600mg por cápsula
+Mecanismo: NAC é precursor direto da glutationa, o antioxidante mestre do corpo. Glutationa = detox hepático, proteção celular, imunidade, saúde respiratória.
+Dores: fígado sobrecarregado, imunidade baixa, cansaço tóxico, exposição a poluição/álcool/medicamentos.
+
+Biotin B7 — Cabelo, pele e unhas (cápsulas, 60 cáps, 45mg biotina/cápsula = 150% VD)
+Ingredientes: Biotina 45mg por cápsula
+Mecanismo: Biotina participa do metabolismo de proteínas, carboidratos e gorduras. Essencial para queratina (cabelo e unhas) e células da pele.
+Dores: queda de cabelo, cabelo fraco/sem brilho, unhas quebradiças, pele sem viço.
+
+═══════════════════════════════════════
+METODOLOGIA MARKETING DE PREMISSAS (OBRIGATÓRIO):
+═══════════════════════════════════════
+
+REGRA FUNDAMENTAL: As premissas NUNCA mencionam o produto, a marca ou suplementos.
+Elas falam apenas de dor, problema, causa e solução genérica.
+O produto só aparece na semana 4 (Conversão), na "solucao", como revelação natural do que a creator usa.
+
+ESTRUTURA DAS 4 SEMANAS:
+- Semana 1: Conscientização da DOR — creator fala do problema que o público tem. "Você também passa por isso?"
+- Semana 2: PREMISSA 1 — Causa raiz do problema (por que acontece, explicação científica simples)
+- Semana 3: PREMISSA 2 — Aprofundamento / segunda causa / dado científico que valida
+- Semana 4: Conversão — PREMISSA 3 + PREMISSA 4 + SOLUÇÃO. Creator revela o que ela usa e por quê.
+
+EXEMPLO DE ROTEIRO BEM FEITO (AFN 32+):
+gancho_01: "Você come pouco e mesmo assim não emagrece?"
+premissa_01: "O problema não está na quantidade de comida — está na qualidade e nos picos de glicose."
+premissa_02: "Aquele docinho da tarde pode ter as mesmas calorias de um prato cheio. E você nem percebe."
+premissa_03: "Não é falta de foco. Seu corpo não consegue controlar o apetite por doce porque a glicose sobe e cai rápido — é ciclo metabólico, não fraqueza."
+premissa_04: "Sem fibra solúvel suficiente, a glicose não se estabiliza. A fome volta. O ciclo não quebra só com força de vontade."
+solucao: "Eu resolvi isso com um suplemento em cápsula que me ajuda com saciedade e controle glicêmico. Sem milagre — bioquímica mesmo. O que eu uso é o AFN32+, da Farmácia Natural."
+gancho_02: "Você merece entender por que não está conseguindo — não se culpar mais."
+cta: "Link na bio para conhecer."
+
+═══════════════════════════════════════
 BRIEFING DO MÊS:
+═══════════════════════════════════════
 - Mês: ${nomeMes}/${briefing.ano}
 - Produto(s) foco: ${nomeProdutos}
 - Objetivo: ${briefing.objetivo}
 - Contexto/Sazonalidade: ${briefing.contexto || 'Nenhum contexto adicional'}
-- Tom: Educativo com premissas científicas, acolhedor, sem promessas miraculosas
-- Estratégia: Reels engaja → Stories converte (Marketing de Premissas)
+- Número de creators: ${numCreators}
 
-METODOLOGIA:
-- Semana 1: Conscientização — Reel educativo de problema/dor. Stories de premissa leve.
-- Semana 2: Premissa 1 — Reel com dado/ciência que valida o produto. Stories com prova social.
-- Semana 3: Premissa 2 — Reel aprofundando benefício específico. Stories com bastidor/uso.
-- Semana 4: Conversão — Reel CTA direto. Stories com oferta/link.
-
-Gere uma estratégia completa para ${numCreators} creator(s) no mês de ${nomeMes}.
-Para cada semana, entregue 1 roteiro de Reel + 2 roteiros de Stories.
-
+═══════════════════════════════════════
 FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
+═══════════════════════════════════════
 {
   "titulo": "Estratégia ${nomeMes}/${briefing.ano} — ${nomeProdutos}",
-  "resumo": "Resumo executivo em 2 linhas",
+  "resumo": "Resumo executivo em 2 linhas explicando a lógica da progressão",
   "semanas": [
     {
       "numero": 1,
-      "tema": "Nome do tema da semana",
+      "tema": "Nome do tema — foco na DOR do público",
       "foco": "conscientizacao",
       "conteudos": [
         {
           "tipo": "educativo",
           "formato": "reel",
           "tema": "Título do Reel",
-          "gancho_01": "Frase de abertura que para o scroll (máx 15 palavras)",
-          "premissa_01": "Premissa científica ou dado que valida (máx 25 palavras)",
-          "premissa_02": "Desenvolvimento ou segunda premissa (máx 25 palavras)",
-          "gancho_02": "Virada ou pergunta reflexiva (máx 15 palavras)",
-          "cta": "Call to action específico (máx 15 palavras)"
+          "gancho_01": "Pergunta ou afirmação que identifica a dor (máx 15 palavras, SEM mencionar produto)",
+          "premissa_01": "Identificação do problema vivido pelo público (SEM produto)",
+          "premissa_02": "Validação emocional — 'não é culpa sua' (SEM produto)",
+          "gancho_02": "Virada — promessa de que existe explicação/solução (SEM produto)",
+          "cta": "Salva esse vídeo / comenta se você também passa por isso"
         },
         {
           "tipo": "indireto",
           "formato": "stories",
           "tema": "Título do Stories 1",
-          "gancho_01": "Abertura do Stories",
-          "premissa_01": "Conteúdo principal",
-          "cta": "Swipe up ou resposta"
+          "gancho_01": "Pergunta que gera identificação",
+          "premissa_01": "Aprofundamento da dor em linguagem simples",
+          "cta": "Responde aqui: você passa por isso?"
         },
         {
           "tipo": "indireto",
           "formato": "stories",
           "tema": "Título do Stories 2",
-          "gancho_01": "Abertura do Stories",
-          "premissa_01": "Conteúdo principal",
-          "cta": "Swipe up ou resposta"
+          "gancho_01": "Dado ou fato surpreendente sobre o problema",
+          "premissa_01": "Explicação acessível do dado",
+          "cta": "Salva para lembrar disso"
         }
       ]
     },
-    { "numero": 2, "tema": "...", "foco": "premissa_1", "conteudos": [...] },
-    { "numero": 3, "tema": "...", "foco": "premissa_2", "conteudos": [...] },
-    { "numero": 4, "tema": "...", "foco": "conversao", "conteudos": [...] }
+    {
+      "numero": 2,
+      "tema": "Nome do tema — CAUSA RAIZ (premissa científica 1)",
+      "foco": "premissa_1",
+      "conteudos": [
+        {
+          "tipo": "educativo",
+          "formato": "reel",
+          "tema": "Título explicando a causa",
+          "gancho_01": "Afirmação que quebra crença errada (SEM produto)",
+          "premissa_01": "Causa raiz científica explicada de forma simples (SEM produto)",
+          "premissa_02": "Segundo argumento que reforça a causa (SEM produto)",
+          "gancho_02": "Provoca curiosidade sobre a solução (SEM revelar produto)",
+          "cta": "Comenta aqui se fez sentido pra você"
+        },
+        {
+          "tipo": "indireto",
+          "formato": "stories",
+          "tema": "Título do Stories 1",
+          "gancho_01": "Continuação da premissa do Reel",
+          "premissa_01": "Dado científico acessível (SEM produto)",
+          "cta": "Manda esse stories para alguém que precisa ver"
+        },
+        {
+          "tipo": "indireto",
+          "formato": "stories",
+          "tema": "Título do Stories 2",
+          "gancho_01": "Pergunta reflexiva sobre hábitos",
+          "premissa_01": "Conexão entre o hábito e o problema",
+          "cta": "Salva para rever"
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "tema": "Nome do tema — APROFUNDAMENTO (premissa científica 2)",
+      "foco": "premissa_2",
+      "conteudos": [
+        {
+          "tipo": "educativo",
+          "formato": "reel",
+          "tema": "Título aprofundando a ciência",
+          "gancho_01": "Dado ou fato que surpreende (SEM produto)",
+          "premissa_01": "Aprofundamento científico — ingrediente/mecanismo sem nomear produto (SEM produto)",
+          "premissa_02": "Como esse mecanismo afeta o dia a dia da pessoa (SEM produto)",
+          "gancho_02": "Preparação para a revelação da semana seguinte",
+          "cta": "Segue pra não perder o próximo vídeo"
+        },
+        {
+          "tipo": "indireto",
+          "formato": "stories",
+          "tema": "Bastidor / rotina da creator",
+          "gancho_01": "Creator compartilha como ela mesma vivia esse problema",
+          "premissa_01": "O que ela descobriu que mudou tudo (SEM revelar produto ainda)",
+          "cta": "Na semana que vem eu conto o que eu uso"
+        },
+        {
+          "tipo": "indireto",
+          "formato": "stories",
+          "tema": "Prova social / identificação",
+          "gancho_01": "Depoimento próprio ou pergunta ao público",
+          "premissa_01": "Resultado que a creator teve antes de entender a causa",
+          "cta": "Responde: você já tentou resolver isso antes?"
+        }
+      ]
+    },
+    {
+      "numero": 4,
+      "tema": "Nome do tema — CONVERSÃO (produto revelado)",
+      "foco": "conversao",
+      "conteudos": [
+        {
+          "tipo": "cta",
+          "formato": "reel",
+          "tema": "Título da revelação + solução",
+          "gancho_01": "Retoma a dor da semana 1 em 1 frase",
+          "premissa_01": "Premissa 3 — aprofundamento final SEM produto ainda",
+          "premissa_02": "Premissa 4 — dado científico do ingrediente ativo",
+          "premissa_03": "Creator conecta as 4 semanas: 'agora você entende por quê'",
+          "premissa_04": "Creator revela que ela usa algo que resolve exatamente isso",
+          "solucao": "Revelação do produto: nome, o que faz, por que ela recomenda (1 parágrafo natural, não promocional)",
+          "gancho_02": "Chamada final empática",
+          "cta": "Link na bio / código de desconto / como comprar"
+        },
+        {
+          "tipo": "cta",
+          "formato": "stories",
+          "tema": "Stories de oferta",
+          "gancho_01": "Retoma a transformação da creator",
+          "premissa_01": "Benefício principal do produto em linguagem simples",
+          "solucao": "Nome do produto + onde comprar + código se tiver",
+          "cta": "Link direto / arrasta pra cima"
+        },
+        {
+          "tipo": "cta",
+          "formato": "stories",
+          "tema": "Stories de urgência / social proof",
+          "gancho_01": "Reação de seguidores / pergunta recebida sobre o produto",
+          "premissa_01": "Resposta da creator com autoridade",
+          "solucao": "Reforço da indicação com resultado pessoal",
+          "cta": "Aproveita enquanto tem / link na bio"
+        }
+      ]
+    }
   ]
 }`
 
@@ -488,16 +641,21 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
             creator_id: creator.id,
             tema: c.tema,
             tipo: c.tipo,
-            formato: c.formato,
+            formato: c.formato || 'reel',
             data_post: dataStr,
+            desenvolvimento: c.solucao || '',
             gancho_01: c.gancho_01 || null,
             premissa_01: c.premissa_01 || null,
             premissa_02: c.premissa_02 || null,
+            premissa_03: c.premissa_03 || null,
+            premissa_04: c.premissa_04 || null,
             gancho_02: c.gancho_02 || null,
             cta: c.cta || null,
+            solucao: c.solucao || null,
             semana: semana.numero,
             mes_referencia: mesRef,
             status: 'pendente',
+            gerado_por_ia: true,
           })
         }
       }

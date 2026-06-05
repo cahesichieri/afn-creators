@@ -4,11 +4,17 @@ import { supabase } from '@/lib/supabase'
 import { callAI } from '@/lib/aiQueue'
 
 const CATALOGO = `
-AFN32+ (R$187,90) — Emagrecimento e metabolismo. Ingredientes: Psyllium (saciedade), Cromo (metabolismo carboidrato/reduz compulsão por doce), Cafeína natural (energia e disposição), Spirulina (nutrição). Ideal para: mulheres que querem emagrecer, reduzir compulsão por doce, ter mais energia. Custo produção: R$10.
-AFN77+ (R$390,00) — Shake de proteína e colágeno em pó. Ideal para: mulheres que treinam, querem ganhar massa magra, cuidar da pele e recuperação muscular. Custo: R$21.
-AFN9+ (R$600,00) — Fórmula premium antienvelhecimento e hormonal. Ideal para: mulheres 35+, menopausa, hormônios, qualidade de vida. Custo: R$12.
-AFN Nac — Detox e imunidade. Ideal para: público focado em saúde preventiva e bem-estar geral. Custo: R$15.
-AFN Biotin B7 — Cabelo, pele e unhas. Ideal para: público de beleza, moda, autoestima feminina. Custo: R$5.
+AFN 32+ (R$187,90) — Emagrecimento e metabolismo. Cápsulas. Ingredientes: Psyllium 400mg (forma gel → saciedade real), Spirulina 400mg (nutrição completa), Cafeína 200mg (energia e gasto calórico), Picolinato de Cromo 220mcg (controla metabolismo de carboidratos, reduz compulsão por doce). Ideal para: mulheres que comem pouco e não emagrecem, compulsão por doce, ciclo glicêmico vicioso, falta de energia para treinar. Perfil: mulheres 25-45 que tentaram de tudo e se culpam por não emagrecer.
+
+AFN 77+ (R$390,00) — Saúde intestinal / prebiótico. Pó sabor framboesa. Regula trânsito intestinal, equilibra microbiota, reduz inchaço e gases, melhora absorção de nutrientes, reduz compulsão por doce. Ideal para: mulheres com barriga sempre inchada, intestino preso/preguiçoso, cansaço sem explicação, humor afetado, absorção ruim. Perfil: mulheres que se queixam de estufamento, digestão lenta.
+
+AFN 9+ (R$600,00) — Potencializador natural / libido e vitalidade. Cápsulas. Ingredientes: Vitamina B6 10mg (769% VD), Magnésio 80mg, Zinco 7mg (100% VD), Arginina 200mg, Boro 8,86mg, Saponinas 300mg. Equilibrio hormonal, libido, energia, performance física. Ideal para: mulheres com cansaço crônico, falta de disposição e libido, queda de desempenho. Perfil: mulheres 30-50, especialmente pós-menopausa ou com queda hormonal.
+
+AFN ClearSkin — Saúde da pele de dentro para fora. Cápsulas 60 unidades. Ingredientes: Vitamina A 2.263mcg (283% VD), Proantocianidinas de Cranberry 200mg, Procianidinas 200mg, Licopeno 8mg. Renovação celular, antioxidante, reduz manchas e melasma, uniformiza tom. Ideal para: mulheres com manchas, pele opaca, melasma, envelhecimento precoce, skincare externo que não resolve. Perfil: mulheres que já investem em skincare mas não veem resultado.
+
+AFN NAC — Antioxidante e detox hepático. Cápsulas 60 unidades, 600mg L-Cisteína. Precursor de glutationa (antioxidante mestre do corpo). Detox hepático, proteção celular, imunidade, saúde respiratória. Ideal para: público de saúde preventiva, mulheres expostas a estresse oxidativo, álcool, medicamentos. Perfil: mulheres focadas em longevidade e saúde preventiva.
+
+Biotin B7 — Cabelo, pele e unhas. Cápsulas 60 unidades, 45mg biotina (150% VD). Essencial para queratina, metabolismo de proteínas. Ideal para: queda de cabelo, unhas quebradiças, pele sem viço. Perfil: mulheres de beleza, lifestyle, autoestima feminina — qualquer nicho que fale de aparência.
 `
 
 export default function OnboardingDashboard() {
