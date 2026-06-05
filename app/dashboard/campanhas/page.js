@@ -294,7 +294,7 @@ function TabEstrategia() {
   const [briefing, setBriefing] = useState({
     mes: mesAtual,
     ano: anoAtual,
-    produto_foco: '',
+    produtos_foco: [],
     objetivo: '',
     contexto: '',
     tom: 'educativo_premissas',
@@ -341,10 +341,19 @@ function TabEstrategia() {
   }
 
   const creatorsAlvo = todasCreators ? creators : creators.filter(c=>creatorsSelected.includes(c.id))
-  const produtoSelecionado = produtos.find(p=>p.id===briefing.produto_foco)
+  const produtosSelecionados = produtos.filter(p=>briefing.produtos_foco.includes(p.id))
+
+  function toggleProduto(id) {
+    setBriefing(b => ({
+      ...b,
+      produtos_foco: b.produtos_foco.includes(id)
+        ? b.produtos_foco.filter(x=>x!==id)
+        : [...b.produtos_foco, id]
+    }))
+  }
 
   async function gerarEstrategia() {
-    if (!briefing.produto_foco) { alert('Selecione o produto foco.'); return }
+    if (briefing.produtos_foco.length === 0) { alert('Selecione pelo menos um produto.'); return }
     if (creatorsAlvo.length===0) { alert('Selecione pelo menos uma creator.'); return }
     if (!briefing.objetivo.trim()) { alert('Preencha o objetivo do mês.'); return }
 
@@ -354,12 +363,13 @@ function TabEstrategia() {
 
     const nomeMes = MESES[briefing.mes]
     const numCreators = creatorsAlvo.length
+    const nomeProdutos = produtosSelecionados.map(p=>p.nome).join(', ')
 
     const prompt = `Você é a IA da A Farmácia Natural (AFN), especialista em Marketing de Premissas para o Instagram.
 
 BRIEFING DO MÊS:
 - Mês: ${nomeMes}/${briefing.ano}
-- Produto foco: ${produtoSelecionado?.nome || briefing.produto_foco}
+- Produto(s) foco: ${nomeProdutos}
 - Objetivo: ${briefing.objetivo}
 - Contexto/Sazonalidade: ${briefing.contexto || 'Nenhum contexto adicional'}
 - Tom: Educativo com premissas científicas, acolhedor, sem promessas miraculosas
@@ -376,7 +386,7 @@ Para cada semana, entregue 1 roteiro de Reel + 2 roteiros de Stories.
 
 FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
 {
-  "titulo": "Estratégia ${nomeMes}/${briefing.ano} — ${produtoSelecionado?.nome || briefing.produto_foco}",
+  "titulo": "Estratégia ${nomeMes}/${briefing.ano} — ${nomeProdutos}",
   "resumo": "Resumo executivo em 2 linhas",
   "semanas": [
     {
@@ -453,7 +463,7 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
     // 1. Salva na tabela estrategias_mensais
     const { data: est } = await supabase.from('estrategias_mensais').insert({
       mes_referencia: mesRef,
-      produto_id: briefing.produto_foco || null,
+      produtos_ids: briefing.produtos_foco,
       objetivo: briefing.objetivo,
       contexto: briefing.contexto,
       creators_ids: creatorsAlvo.map(c=>c.id),
@@ -476,8 +486,6 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
         for (const c of semana.conteudos) {
           roteiros.push({
             creator_id: creator.id,
-            campanha_id: null,
-            produto_id: briefing.produto_foco || null,
             tema: c.tema,
             tipo: c.tipo,
             formato: c.formato,
@@ -536,14 +544,23 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
                 </div>
               </div>
 
-              {/* Produto foco */}
-              <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                <label style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Produto foco</label>
-                <select value={briefing.produto_foco} onChange={e=>setBriefing(b=>({...b,produto_foco:e.target.value}))}
-                  style={{padding:'8px 10px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.78rem',background:'var(--bg)',outline:'none'}}>
-                  <option value="">Selecionar produto...</option>
-                  {produtos.map(p=><option key={p.id} value={p.id}>{p.nome}</option>)}
-                </select>
+              {/* Produtos foco — multi-select via checkboxes */}
+              <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                <label style={{fontSize:'.58rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Produto(s) foco</label>
+                <div style={{display:'flex',flexDirection:'column',gap:4}}>
+                  {produtos.map(p => {
+                    const sel = briefing.produtos_foco.includes(p.id)
+                    return (
+                      <label key={p.id} onClick={()=>toggleProduto(p.id)}
+                        style={{display:'flex',alignItems:'center',gap:8,padding:'7px 10px',borderRadius:4,border:`1px solid ${sel?'var(--navy)':'var(--rule)'}`,background:sel?'var(--navy-xs)':'var(--bg)',cursor:'pointer',fontSize:'.78rem',userSelect:'none'}}>
+                        <span style={{width:14,height:14,borderRadius:3,border:`2px solid ${sel?'var(--navy)':'var(--ink3)'}`,background:sel?'var(--navy)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                          {sel && <span style={{color:'#fff',fontSize:9,fontWeight:900,lineHeight:1}}>✓</span>}
+                        </span>
+                        <span style={{fontWeight:sel?600:400,color:sel?'var(--navy)':'var(--ink1)'}}>{p.nome}</span>
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
 
               {/* Objetivo */}
