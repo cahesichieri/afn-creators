@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { callAI } from '@/lib/aiQueue'
 
 const fmt = n => (n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})
 
@@ -78,14 +79,9 @@ function TabCampanhas() {
         { type:'text', text:`Analise estes prints do Instagram Insights. Extraia TODOS os dados numéricos visíveis. Depois forneça uma análise de performance. Responda em português.\n\n## Dados Extraídos\n(liste cada métrica com valor exato)\n\n## Diagnóstico de Performance\n## Pontos Fortes  \n## O que Melhorar\n## Recomendações` },
         ...imagens.map(img=>({type:'image',source:{type:'base64',media_type:img.type,data:img.data}}))
       ]
-      const resp = await fetch('/api/ai',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:[{role:'user',content}]})
-      })
-      const data = await resp.json()
-      const texto = data.content?.find(b=>b.type==='text')?.text||''
+      const texto = await callAI({ messages:[{role:'user',content}] })
       setForm(f=>({...f, analise_ia:texto, fonte:'prints_ia'}))
-    } catch(e) { alert('Erro ao analisar prints.') }
+    } catch(e) { alert(`Erro ao analisar prints: ${e.message}`) }
     setAnalisando(false)
   }
 
@@ -423,20 +419,10 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
 }`
 
     try {
-      const resp = await fetch('/api/ai', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ messages:[{role:'user',content:prompt}], max_tokens:6000 })
-      })
-      const data = await resp.json()
-
-      // Verifica erro da API (429, 500, etc.)
-      if (!resp.ok || data.error) {
-        const msg = data.error || `Erro ${resp.status}`
-        if (resp.status === 429) throw new Error('Limite de requisições atingido. Aguarde alguns segundos e tente novamente.')
-        throw new Error(msg)
-      }
-
-      const texto = data.content?.find(b=>b.type==='text')?.text || ''
+      const texto = await callAI(
+        { messages:[{role:'user',content:prompt}], max_tokens:6000 },
+        { onRetry: (n, ms) => console.log(`Estratégia: tentativa ${n}, aguardando ${ms}ms...`) }
+      )
       if (!texto) throw new Error('A IA retornou uma resposta vazia.')
 
       // Parse JSON da resposta — tenta encontrar o bloco JSON

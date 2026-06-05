@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { callAI } from '@/lib/aiQueue'
 
 const CATALOGO = `
 AFN32+ (R$187,90) — Emagrecimento e metabolismo. Ingredientes: Psyllium (saciedade), Cromo (metabolismo carboidrato/reduz compulsão por doce), Cafeína natural (energia e disposição), Spirulina (nutrição). Ideal para: mulheres que querem emagrecer, reduzir compulsão por doce, ter mais energia. Custo produção: R$10.
@@ -35,15 +36,7 @@ export default function OnboardingDashboard() {
     const resumo = Object.entries(respostas).map(([k,v]) => `${k}: ${v}`).join('\n')
 
     try {
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: `Você é especialista em marketing de nutracêuticos femininos da A Farmácia Natural (AFN).
+      const prompt = `Você é especialista em marketing de nutracêuticos femininos da A Farmácia Natural (AFN).
 
 CATÁLOGO DE PRODUTOS:
 ${CATALOGO}
@@ -63,14 +56,12 @@ Responda APENAS com JSON válido, sem markdown:
   "justificativa_2": "por que esse produto para essa creator (2-3 linhas)",
   "estrategia": "como essa creator deve abordar esses produtos dado seu perfil e público (3-4 linhas)"
 }`
-          }]
-        })
-      })
-      const data = await res.json()
-      if (!res.ok || data.error) throw new Error(data.error || 'Erro na API')
-      const texto = data.content?.find(b => b.type === 'text')?.text || ''
-      if (!texto) throw new Error('Resposta vazia da IA')
-      // extrai JSON mesmo que venha com markdown ou texto extra
+
+      const texto = await callAI(
+        { messages: [{ role: 'user', content: prompt }], max_tokens: 1000 },
+        { onRetry: (n, ms) => console.log(`IA: tentativa ${n}, aguardando ${ms}ms...`) }
+      )
+
       const jsonMatch = texto.match(/\{[\s\S]*\}/)
       if (!jsonMatch) throw new Error('JSON não encontrado na resposta')
       const rec = JSON.parse(jsonMatch[0])
@@ -88,7 +79,7 @@ Responda APENAS com JSON válido, sem markdown:
 
       carregar()
     } catch(e) {
-      alert('Erro ao analisar. Tente novamente.')
+      alert(`Erro ao analisar: ${e.message}`)
     }
     setAnalisando(null)
   }

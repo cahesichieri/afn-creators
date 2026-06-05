@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { callAI } from '@/lib/aiQueue'
 
 const tipoColors = { educativo:'var(--teal-d)', indireto:'var(--amber)', cta:'var(--green)', lifestyle:'var(--navy)' }
 const tipoBg = { educativo:'var(--teal-lt)', indireto:'var(--amber-lt)', cta:'var(--green-lt)', lifestyle:'var(--navy-xs)' }
@@ -29,9 +30,7 @@ export default function Roteiros() {
     setGerando(true)
     const creator = creators.find(c=>c.id===form.creator_id)
     try {
-      const res = await fetch('/api/ai',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:[{role:'user',content:`Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos. Crie um roteiro condensado para a creator ${creator?.nome||''}.
+      const prompt = `Você é especialista em Marketing de Premissas para A Farmácia Natural (AFN), suplementos femininos. Crie um roteiro condensado para a creator ${creator?.nome||''}.
 
 Tema: "${form.tema}"
 Tipo: ${form.tipo} | Formato: ${form.formato}
@@ -45,17 +44,13 @@ Retorne APENAS um JSON válido sem markdown:
   "premissa_03": "terceira premissa (se aplicável, senão vazio)",
   "gancho_02": "gancho de fechamento antes do CTA",
   "cta": "chamada para ação (se for conteúdo de venda, senão vazio)"
-}`}]})
-      })
-      const d = await res.json()
-      if (!res.ok || d.error) throw new Error(d.error || 'Erro na API')
-      const texto = d.content?.find(b=>b.type==='text')?.text||''
-      if (!texto) throw new Error('Resposta vazia da IA')
+}`
+      const texto = await callAI({ messages: [{ role: 'user', content: prompt }] })
       const jsonMatch = texto.match(/\{[\s\S]*\}/)
       if (!jsonMatch) throw new Error('JSON não encontrado')
       const parsed = JSON.parse(jsonMatch[0])
       setForm(f=>({...f,...parsed, gerado_por_ia:true}))
-    } catch(e) { alert('Erro ao gerar roteiro.') }
+    } catch(e) { alert(`Erro ao gerar roteiro: ${e.message}`) }
     setGerando(false)
   }
 
