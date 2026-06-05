@@ -425,15 +425,30 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
     try {
       const resp = await fetch('/api/ai', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ messages:[{role:'user',content:prompt}], max_tokens:3000 })
+        body: JSON.stringify({ messages:[{role:'user',content:prompt}], max_tokens:6000 })
       })
       const data = await resp.json()
-      const texto = data.content?.find(b=>b.type==='text')?.text || ''
 
-      // Parse JSON da resposta
+      // Verifica erro da API (429, 500, etc.)
+      if (!resp.ok || data.error) {
+        const msg = data.error || `Erro ${resp.status}`
+        if (resp.status === 429) throw new Error('Limite de requisições atingido. Aguarde alguns segundos e tente novamente.')
+        throw new Error(msg)
+      }
+
+      const texto = data.content?.find(b=>b.type==='text')?.text || ''
+      if (!texto) throw new Error('A IA retornou uma resposta vazia.')
+
+      // Parse JSON da resposta — tenta encontrar o bloco JSON
+      let estrategia
       const jsonMatch = texto.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('Resposta fora do formato esperado')
-      const estrategia = JSON.parse(jsonMatch[0])
+      if (!jsonMatch) throw new Error('A IA não retornou o formato esperado. Tente gerar novamente.')
+      try {
+        estrategia = JSON.parse(jsonMatch[0])
+      } catch {
+        throw new Error('Erro ao interpretar resposta da IA. Tente gerar novamente.')
+      }
+      if (!estrategia.semanas?.length) throw new Error('Estratégia incompleta. Tente gerar novamente.')
       setPreview(estrategia)
       setSemanaAberta(0)
     } catch(e) {
