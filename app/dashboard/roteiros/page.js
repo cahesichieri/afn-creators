@@ -45,6 +45,9 @@ As premissas (premissa_01 a premissa_04) NUNCA mencionam produto, marca ou suple
 Elas falam apenas de dor, causa científica e mecanismo. O produto só aparece no campo "desenvolvimento" (roteiros de conversão).
 Premissas educativas = sem produto. Roteiro de CTA/conversão = produto aparece só no desenvolvimento/cta.
 
+OBRIGATÓRIO: Reels educativos e de CTA DEVEM ter premissa_01, premissa_02, premissa_03 e premissa_04 — TODAS preenchidas.
+Nunca deixe premissa_03 ou premissa_04 vazios em Reels. Stories podem ter no mínimo 2 premissas.
+
 Creator: ${creator?.nome||''}
 Tema: "${form.tema}"
 Tipo: ${form.tipo} | Formato: ${form.formato}

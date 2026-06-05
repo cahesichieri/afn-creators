@@ -41,6 +41,13 @@ function TabCampanhas() {
   const [analisando, setAnalisando] = useState(false)
   const [uploads, setUploads] = useState([])
   const [produtosSelecionados, setProdutosSelecionados] = useState([])
+
+  // Filtros
+  const [filtroCreator, setFiltroCreator] = useState('')
+  const [filtroInicio, setFiltroInicio] = useState('')
+  const [filtroFim, setFiltroFim] = useState('')
+  const [ordenacao, setOrdenacao] = useState('recente') // recente | melhor | pior
+
   const [form, setForm] = useState({
     creator_id:null, data_inicio:'', data_fim:'', fonte:'manual', produto_id:null,
     leads:0, checkouts:0, pedidos_gerados:0, pedidos_pagos:0, receita:0,
@@ -134,22 +141,72 @@ function TabCampanhas() {
     </div>
   )
 
+  const campsFiltradas = campanhas
+    .filter(c => {
+      if (filtroCreator && c.creator_id !== filtroCreator) return false
+      if (filtroInicio && c.created_at < filtroInicio) return false
+      if (filtroFim && c.created_at > filtroFim + 'T23:59:59') return false
+      return true
+    })
+    .sort((a, b) => {
+      if (ordenacao === 'melhor') return (b.receita||0) - (a.receita||0)
+      if (ordenacao === 'pior') return (a.receita||0) - (b.receita||0)
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
+
   return (
     <div>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-        <div style={{fontSize:'.6rem',textTransform:'uppercase',letterSpacing:'.2em',color:'var(--teal)',fontWeight:700}}>
-          {campanhas.length} campanha{campanhas.length!==1?'s':''} registrada{campanhas.length!==1?'s':''}
+      {/* BARRA DE FILTROS */}
+      <div style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,padding:'12px 16px',marginBottom:16,display:'flex',gap:10,flexWrap:'wrap',alignItems:'flex-end'}}>
+        <div style={{display:'flex',flexDirection:'column',gap:4,flex:'1 1 160px'}}>
+          <label style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Creator</label>
+          <select value={filtroCreator} onChange={e=>setFiltroCreator(e.target.value)}
+            style={{padding:'7px 10px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.76rem',background:'var(--bg)',outline:'none'}}>
+            <option value="">Todas</option>
+            {creators.map(c=><option key={c.id} value={c.id}>{c.nome}</option>)}
+          </select>
         </div>
-        <button onClick={()=>setModal(true)} style={{background:'var(--navy)',color:'#fff',border:'none',borderRadius:4,padding:'8px 16px',fontSize:'.75rem',fontWeight:600}}>
-          + Inserir campanha
-        </button>
+        <div style={{display:'flex',flexDirection:'column',gap:4,flex:'1 1 130px'}}>
+          <label style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>De</label>
+          <input type="date" value={filtroInicio} onChange={e=>setFiltroInicio(e.target.value)}
+            style={{padding:'7px 10px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.76rem',background:'var(--bg)',outline:'none'}}/>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:4,flex:'1 1 130px'}}>
+          <label style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Até</label>
+          <input type="date" value={filtroFim} onChange={e=>setFiltroFim(e.target.value)}
+            style={{padding:'7px 10px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.76rem',background:'var(--bg)',outline:'none'}}/>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:4,flex:'1 1 150px'}}>
+          <label style={{fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',color:'var(--ink3)',fontWeight:700}}>Ordenar por</label>
+          <select value={ordenacao} onChange={e=>setOrdenacao(e.target.value)}
+            style={{padding:'7px 10px',border:'1px solid var(--rule)',borderRadius:4,fontSize:'.76rem',background:'var(--bg)',outline:'none'}}>
+            <option value="recente">Mais recente</option>
+            <option value="melhor">Melhor resultado</option>
+            <option value="pior">Pior resultado</option>
+          </select>
+        </div>
+        <div style={{display:'flex',gap:8,alignItems:'flex-end'}}>
+          {(filtroCreator||filtroInicio||filtroFim||ordenacao!=='recente') && (
+            <button onClick={()=>{setFiltroCreator('');setFiltroInicio('');setFiltroFim('');setOrdenacao('recente')}}
+              style={{padding:'7px 12px',border:'1px solid var(--rule)',borderRadius:4,background:'transparent',fontSize:'.72rem',color:'var(--ink3)',cursor:'pointer',whiteSpace:'nowrap'}}>
+              Limpar
+            </button>
+          )}
+          <button onClick={()=>setModal(true)} style={{background:'var(--navy)',color:'#fff',border:'none',borderRadius:4,padding:'8px 16px',fontSize:'.75rem',fontWeight:600,whiteSpace:'nowrap'}}>
+            + Inserir campanha
+          </button>
+        </div>
+      </div>
+
+      <div style={{fontSize:'.6rem',textTransform:'uppercase',letterSpacing:'.2em',color:'var(--teal)',fontWeight:700,marginBottom:12}}>
+        {campsFiltradas.length} campanha{campsFiltradas.length!==1?'s':''} {campsFiltradas.length!==campanhas.length?`(de ${campanhas.length} total)`:''}
       </div>
 
       <div style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
-        {campanhas.length===0 ? (
+        {campsFiltradas.length===0 ? (
           <div style={{textAlign:'center',padding:48,color:'var(--ink3)'}}>
             <div style={{fontSize:'2rem',opacity:.25,marginBottom:10}}>📥</div>
-            <p style={{fontSize:'.78rem'}}>Nenhuma campanha ainda.</p>
+            <p style={{fontSize:'.78rem'}}>Nenhuma campanha encontrada.</p>
           </div>
         ) : (
           <table style={{width:'100%',borderCollapse:'collapse'}}>
@@ -159,7 +216,7 @@ function TabCampanhas() {
               ))}
             </tr></thead>
             <tbody>
-              {campanhas.map(c=>{
+              {campsFiltradas.map(c=>{
                 const conv = c.leads>0?(c.pedidos_pagos/c.leads*100).toFixed(1):0
                 const comissao = (c.receita||0)*0.15
                 return (
@@ -312,6 +369,8 @@ function TabEstrategia() {
 
   // Expandir semana no preview
   const [semanaAberta, setSemanaAberta] = useState(0)
+  // Expandir estratégia no histórico
+  const [estrategiaAberta, setEstrategiaAberta] = useState(null)
 
   useEffect(() => { carregarDados() }, [])
 
@@ -364,6 +423,21 @@ function TabEstrategia() {
     const nomeMes = MESES[briefing.mes]
     const numCreators = creatorsAlvo.length
     const nomeProdutos = produtosSelecionados.map(p=>p.nome).join(', ')
+    const mesRef = `${nomeMes}/${briefing.ano}`
+
+    // Verifica histórico para avisar sobre duplicatas
+    const historicoTexto = estrategias.length > 0
+      ? `\nESTRATÉGIAS ANTERIORES (evite repetir os mesmos temas e ganchos):\n` +
+        estrategias.slice(0,5).map(e => `- ${e.mes_referencia}: "${e.objetivo}" — produtos: ${(e.produtos_ids||[]).join(',')}`).join('\n')
+      : ''
+    const duplicata = estrategias.find(e =>
+      e.mes_referencia === mesRef ||
+      (e.produtos_ids?.join(',') === briefing.produtos_foco.join(',') && e.objetivo?.toLowerCase() === briefing.objetivo.toLowerCase())
+    )
+    if (duplicata && !window.confirm(`⚠️ Já existe uma estratégia para "${duplicata.mes_referencia}" com objetivo similar.\n\nA IA vai gerar uma versão diferente considerando os resultados anteriores. Continuar?`)) {
+      setGerando(false)
+      return
+    }
 
     const prompt = `Você é a IA da A Farmácia Natural (AFN), especialista em Marketing de Premissas para o Instagram.
 
@@ -433,6 +507,14 @@ BRIEFING DO MÊS:
 - Objetivo: ${briefing.objetivo}
 - Contexto/Sazonalidade: ${briefing.contexto || 'Nenhum contexto adicional'}
 - Número de creators: ${numCreators}
+${historicoTexto}
+
+═══════════════════════════════════════
+REGRA DE OURO SOBRE PREMISSAS:
+Cada conteúdo do tipo "educativo" ou "cta" DEVE ter obrigatoriamente premissa_01, premissa_02, premissa_03 E premissa_04.
+Stories podem ter no mínimo premissa_01 e premissa_02.
+NUNCA gere um roteiro com menos de 4 premissas para Reels educativos e de conversão.
+═══════════════════════════════════════
 
 ═══════════════════════════════════════
 FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
@@ -654,7 +736,7 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
             solucao: c.solucao || null,
             semana: semana.numero,
             mes_referencia: mesRef,
-            status: 'pendente',
+            status: 'planejado',
             gerado_por_ia: true,
           })
         }
@@ -836,10 +918,13 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
                         <div style={{padding:'10px 14px',display:'grid',gap:5}}>
                           {[
                             ['Gancho 01', c.gancho_01, '#f0eeff', 'var(--navy)'],
-                            ['Premissa 01', c.premissa_01, '#edfbff', '#1a6e8a'],
+                            c.premissa_01 && ['Premissa 01', c.premissa_01, '#edfbff', '#1a6e8a'],
                             c.premissa_02 && ['Premissa 02', c.premissa_02, '#edfbff', '#1a6e8a'],
+                            c.premissa_03 && ['Premissa 03', c.premissa_03, '#edfbff', '#1a6e8a'],
+                            c.premissa_04 && ['Premissa 04', c.premissa_04, '#edfbff', '#1a6e8a'],
                             c.gancho_02 && ['Gancho 02', c.gancho_02, '#f0eeff', 'var(--navy)'],
-                            ['CTA', c.cta, 'var(--green-lt)', 'var(--green)'],
+                            c.solucao && ['Solução', c.solucao, 'var(--amber-lt)', 'var(--amber)'],
+                            c.cta && ['CTA', c.cta, 'var(--green-lt)', 'var(--green)'],
                           ].filter(Boolean).map(([label,val,bg,color])=>val&&(
                             <div key={label} style={{display:'grid',gridTemplateColumns:'90px 1fr',border:'1px solid var(--rule)',borderRadius:3,overflow:'hidden'}}>
                               <div style={{padding:'6px 10px',background:bg,borderRight:'1px solid var(--rule)',fontSize:'.55rem',textTransform:'uppercase',letterSpacing:'.1em',fontWeight:700,color,display:'flex',alignItems:'center'}}>{label}</div>
@@ -878,15 +963,44 @@ FORMATO DE RESPOSTA — JSON puro, sem markdown, sem explicação:
             <div style={{marginTop:24}}>
               <div style={{fontSize:'.6rem',textTransform:'uppercase',letterSpacing:'.2em',color:'var(--ink3)',fontWeight:700,marginBottom:10}}>Estratégias anteriores</div>
               <div style={{display:'flex',flexDirection:'column',gap:6}}>
-                {estrategias.map(e=>(
-                  <div key={e.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <div>
-                      <div style={{fontSize:'.8rem',fontWeight:600,color:'var(--ink)'}}>{e.mes_referencia}</div>
-                      <div style={{fontSize:'.66rem',color:'var(--ink3)',marginTop:2}}>{e.objetivo}</div>
+                {estrategias.map(e=>{
+                  const aberto = estrategiaAberta === e.id
+                  let conteudo = null
+                  try { conteudo = e.conteudo_json ? JSON.parse(e.conteudo_json) : null } catch {}
+                  return (
+                    <div key={e.id} style={{background:'var(--card)',border:'1px solid var(--rule)',borderRadius:6,overflow:'hidden'}}>
+                      <div onClick={()=>setEstrategiaAberta(aberto?null:e.id)}
+                        style={{padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',cursor:'pointer',background:aberto?'var(--navy-xs)':'transparent'}}>
+                        <div>
+                          <div style={{fontSize:'.82rem',fontWeight:700,color:'var(--ink)'}}>{e.mes_referencia}</div>
+                          <div style={{fontSize:'.66rem',color:'var(--ink3)',marginTop:2}}>{e.objetivo}</div>
+                        </div>
+                        <div style={{display:'flex',alignItems:'center',gap:10}}>
+                          <div style={{fontSize:'.62rem',color:'var(--ink3)'}}>{new Date(e.created_at).toLocaleDateString('pt-BR')}</div>
+                          <span style={{color:'var(--ink3)',fontSize:'.75rem'}}>{aberto?'▲':'▼'}</span>
+                        </div>
+                      </div>
+                      {aberto && conteudo && (
+                        <div style={{padding:'0 14px 14px'}}>
+                          {conteudo.resumo && <p style={{fontSize:'.76rem',color:'var(--ink2)',lineHeight:1.55,marginBottom:12,padding:'8px 10px',background:'var(--teal-lt)',borderLeft:'3px solid var(--teal-d)',borderRadius:3}}>{conteudo.resumo}</p>}
+                          {conteudo.semanas?.map((sem,si)=>(
+                            <div key={si} style={{marginBottom:8}}>
+                              <div style={{fontSize:'.66rem',fontWeight:700,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:4}}>
+                                Semana {sem.numero} — {sem.tema}
+                              </div>
+                              {sem.conteudos?.map((c,ci)=>(
+                                <div key={ci} style={{fontSize:'.72rem',color:'var(--ink2)',marginLeft:10,marginBottom:2}}>
+                                  <span style={{fontSize:'.58rem',fontWeight:700,color:c.formato==='reel'?'var(--navy)':'var(--teal-d)',textTransform:'uppercase'}}>{c.formato}</span>
+                                  {' · '}{c.tema}
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div style={{fontSize:'.62rem',color:'var(--ink3)'}}>{new Date(e.created_at).toLocaleDateString('pt-BR')}</div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
